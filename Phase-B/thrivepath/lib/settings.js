@@ -1,0 +1,1 @@
+export const URL = "https://thrive-path.vercel.app" // SERVER VERCEL
