@@ -1,5 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+settings.js
 # dependencies
 /node_modules
 /.pnp
@@ -7,6 +6,8 @@
 
 # testing
 /coverage
+
+.env
 
 # production
 /build
