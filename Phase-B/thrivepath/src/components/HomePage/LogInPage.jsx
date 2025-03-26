@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 
 const SignInPage = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,8 +27,8 @@ const SignInPage = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log("WORK !")
         localStorage.setItem("token", data.token);
+        navigate("/select-patient");
       } else {
         setError(data.message || "Login failed");
       }
@@ -40,21 +41,15 @@ const SignInPage = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-3xl font-bold text-center text-blue-600">Sign In</h2>
-        <p className="text-gray-600 text-center mt-2">
-          Welcome back! Please log in.
-        </p>
+        <p className="text-gray-600 text-center mt-2">Welcome back! Please log in.</p>
 
         {error && (
-          <div className="mt-4 text-red-600 text-center font-medium">
-            {error}
-          </div>
+          <div className="mt-4 text-red-600 text-center font-medium">{error}</div>
         )}
 
         <form className="mt-6" onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium">
-              Email
-            </label>
+            <label className="block text-gray-700 text-sm font-medium">Email</label>
             <input
               type="email"
               name="email"
@@ -66,9 +61,7 @@ const SignInPage = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium">
-              Password
-            </label>
+            <label className="block text-gray-700 text-sm font-medium">Password</label>
             <input
               type="password"
               name="password"
