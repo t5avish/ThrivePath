@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 export default async function handler(req, res) {
   await new Promise((resolve, reject) => cors(req, res, (result) => (result instanceof Error ? reject(result) : resolve())));
-
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -18,10 +18,11 @@ export default async function handler(req, res) {
 
   try {
     const token = authHeader.split(' ')[1];
+
     const decoded = jwt.verify(token, JWT_SECRET);
-    
+
     const db = await connectToDatabase();
-    
+
     const patientData = req.body;
     if (!patientData.name || !patientData.gender || !patientData.birthdate) {
       return res.status(400).json({ message: 'Incomplete patient information' });
@@ -29,6 +30,7 @@ export default async function handler(req, res) {
 
     const newPatient = {
       ...patientData,
+      userId: decoded.userId,
     };
 
     const result = await db.collection('patients').insertOne(newPatient);
