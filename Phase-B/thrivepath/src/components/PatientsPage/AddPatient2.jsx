@@ -1,29 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const AddPatient2 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [file, setFile] = useState(null);
+  const [error, setError] = useState("");
+
+  // Check for user token on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/signin");
+    }
+  }, [navigate]);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!file) {
       alert("Please upload a file before completing the process.");
       return;
     }
     
-    const patientData = {
-      ...location.state,
-      diagnosticFile: file.name,
-    };
-    
-    console.log("Patient Profile:", patientData);
-    navigate("/select-patient");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/get-user-info", {
+        method: "GET",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user information");
+      }
+
+      const userData = await response.json();
+
+      // Prepare patient data
+      const patientData = {
+        ...location.state,
+        diagnosticFile: file.name,
+        user: {
+          name: userData.name,
+          email: userData.email
+        }
+      };
+      
+      // Send patient data to backend
+      const saveResponse = await fetch("/api/add-new-patient", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(patientData)
+      });
+
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        throw new Error(errorData.message || "Failed to save patient");
+      }
+
+      // Navigate to patient select page on successful save
+      navigate("/select-patient");
+    } catch (error) {
+      console.error("Error saving patient:", error);
+      setError(error.message);
+    }
   };
 
   return (
@@ -47,6 +96,10 @@ const AddPatient2 = () => {
 
         <h1 className="text-2xl font-bold text-center text-blue-600 mb-6">Add New Child</h1>
         <p className="text-gray-700 text-center mb-8">Step 2: Upload a diagnostic file</p>
+
+        {error && (
+          <div className="mb-4 text-red-600 text-center">{error}</div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg">
