@@ -7,7 +7,6 @@ const AddPatient2 = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
 
-  // Check for user token on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -42,7 +41,6 @@ const AddPatient2 = () => {
 
       const userData = await response.json();
 
-      // Prepare patient data
       const patientData = {
         ...location.state,
         diagnosticFile: file.name,
@@ -52,7 +50,6 @@ const AddPatient2 = () => {
         }
       };
       
-      // Send patient data to backend
       const saveResponse = await fetch("/api/add-new-patient", {
         method: "POST",
         headers: { 
@@ -67,7 +64,6 @@ const AddPatient2 = () => {
         throw new Error(errorData.message || "Failed to save patient");
       }
 
-      // Navigate to patient select page on successful save
       navigate("/select-patient");
     } catch (error) {
       console.error("Error saving patient:", error);
@@ -78,7 +74,6 @@ const AddPatient2 = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md">
-        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex-1">

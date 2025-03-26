@@ -1,54 +1,75 @@
 import React, { useState } from "react";
 
 const SignUpPage = () => {
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        password: "",
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+  });
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirm_password) {
+      setErrorMessage("Passwords do not match.");
+      setSuccessMessage(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
 
-      const [errorMessage, setErrorMessage] = useState('');
-      const [successMessage, setSuccessMessage] = useState(false);
-    
-      const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-      };
+      const contentType = response.headers.get("content-type");
+      const isJson = contentType && contentType.includes("application/json");
 
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-          const response = await fetch('/api/signup', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-          });
-      
-          const contentType = response.headers.get('content-type');
-          const isJson = contentType && contentType.includes('application/json');
-      
-          const result = isJson ? await response.json() : await response.text();
-      
-          if (response.ok) {
-            setSuccessMessage(true);
-            setErrorMessage('');
-          } else {
-            setErrorMessage(result?.message || result || 'An error occurred');
-            setSuccessMessage(false);
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          setErrorMessage('An error occurred. Please try again later.');
-          setSuccessMessage(false);
-        }
-      };
+      const result = isJson ? await response.json() : await response.text();
+
+      if (response.ok) {
+        setSuccessMessage("Signup successful! You can now log in.");
+        setErrorMessage("");
+        setFormData({ name: "", email: "", password: "", confirm_password: "" });
+      } else {
+        setErrorMessage(result?.message || result || "An error occurred.");
+        setSuccessMessage(false);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorMessage("An error occurred. Please try again later.");
+      setSuccessMessage(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-3xl font-bold text-center text-blue-600">Sign Up</h2>
         <p className="text-gray-600 text-center mt-2">Create your account</p>
+
+        {/* Success and Error Messages */}
+        {errorMessage && (
+          <div className="bg-red-100 text-red-700 p-3 rounded-md mt-4 text-center">
+            {errorMessage}
+          </div>
+        )}
+        {successMessage && (
+          <div className="bg-green-100 text-green-700 p-3 rounded-md mt-4 text-center">
+            {successMessage}
+          </div>
+        )}
 
         <form className="mt-6" onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -90,7 +111,7 @@ const SignUpPage = () => {
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-medium">Confirm Password</label>
             <input
-              type="confirm_password"
+              type="password"
               name="confirm_password"
               value={formData.confirm_password}
               onChange={handleChange}

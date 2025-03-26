@@ -1,6 +1,7 @@
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';
+import { ObjectId } from 'mongodb';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
   try {
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, JWT_SECRET);
-
+    
     const db = await connectToDatabase();
     
     const patients = await db.collection('patients')
