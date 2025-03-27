@@ -1,11 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import ProtocolGenerator from "./ProtocolGenerator";
 
 const AddPatient2 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
+
+  const { birthdate, gender, weight } = location.state || {};
+
+  function calculateAge(birthdate) {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    
+    // Adjust age if the birthday hasn't occurred yet this year
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+  }
+
+  const age = calculateAge(birthdate);
+  const patientData = { age, gender, weight };
+
+  const protocol = ProtocolGenerator(patientData);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -58,7 +79,7 @@ const AddPatient2 = () => {
         },
         body: JSON.stringify(patientData)
       });
-
+      console.log(protocol)
       if (!saveResponse.ok) {
         const errorData = await saveResponse.json();
         throw new Error(errorData.message || "Failed to save patient");
