@@ -46,29 +46,43 @@ const AddPatient2 = () => {
       return;
     }
     
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("You must be logged in to use this feature.");
+      return;
+    }
+/*
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/get-user-info", {
-        method: "GET",
-        headers: { 
+      const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: "whats 2+2?" }],
+        }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch user information");
+  
+      const data = await response.json();
+      if (response.ok) {
+        console.log("OpenAI Response:", data.response);
+        alert("OpenAI Response: " + data.response);
+      } else {
+        console.error("OpenAI API Error:", data.message);
+        alert("Error: " + data.message);
       }
+    } catch (error) {
+      console.error("Request failed:", error);
+      alert("Failed to connect to OpenAI API.");
+    }
+  */
 
-      const userData = await response.json();
-
+    try {
       const patientData = {
         ...location.state,
         diagnosticFile: file.name,
-        user: {
-          name: userData.name,
-          email: userData.email
-        }
       };
       
       const saveResponse = await fetch("/api/add-new-patient", {
@@ -79,7 +93,6 @@ const AddPatient2 = () => {
         },
         body: JSON.stringify(patientData)
       });
-      console.log(protocol)
       if (!saveResponse.ok) {
         const errorData = await saveResponse.json();
         throw new Error(errorData.message || "Failed to save patient");

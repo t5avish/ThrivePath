@@ -135,7 +135,6 @@ const calculatePhysicalActivity = (age) => {
 };
 
 const ProtocolGenerator = ({ gender, age, weight }) => {
-    console.log(gender, age, weight);
     const medianWeight = getMedianWeight(gender, age);
     const DCV = calculateDailyCalories(weight, medianWeight);
     const dailyCarbohydrates = calculateDailyCarbohydrates(DCV);

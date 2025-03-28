@@ -17,7 +17,6 @@ const AddPatient1 = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Step 1 Data:", formData);
     navigate("/add-patient-file", { state: formData });
   };
 
