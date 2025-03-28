@@ -42,6 +42,7 @@ const SelectPatient = () => {
   }, [navigate]);
 
   const handleSelect = (patientId) => {
+    navigate(`/treatment/${patientId}`);
   };
 
   const handleAddNewChild = () => {

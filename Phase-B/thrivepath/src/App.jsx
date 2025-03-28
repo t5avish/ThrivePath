@@ -5,6 +5,7 @@ import SignIn from "./components/HomePage/LogInPage";
 import SelectPatient from "./components/PatientsPage/SelectPatient";
 import AddPatient1 from "./components/PatientsPage/AddPatient1";
 import AddPatient2 from "./components/PatientsPage/AddPatient2";
+import TreatmentPage from "./components/PatientDashboard/TreatmentPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/select-patient" element={<SelectPatient />} />
         <Route path="/add-patient-info" element={<AddPatient1 />} />
         <Route path="/add-patient-file" element={<AddPatient2 />} />
+        <Route path="/treatment/:patientId" element={<TreatmentPage />} />
       </Routes>
     </Router>
   );
