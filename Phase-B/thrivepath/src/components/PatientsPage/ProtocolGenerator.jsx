@@ -106,7 +106,7 @@ const calculateSleepHours = (age) => {
 
 const calculateHydration = (age) => {
     if (age === 0) {
-        return "3-4, Most of the water needs are met through breast milk or formula.";
+        return "Most of the water needs are met through breast milk or formula. 3-4";
     } else if (age >= 1 && age <= 3) {
         return "4";
     } else if (age >= 4 && age <= 8) {
@@ -140,33 +140,34 @@ const ProtocolGenerator = ({ gender, age, weight }) => {
     const dailyCarbohydrates = calculateDailyCarbohydrates(DCV);
     const dailyProteins = calculateDailyProteins(DCV);
     const dailyFats = calculateDailyFats(DCV);
-    const Zinc = 25;
-    const Calcium = calculateCalcium(age);
-    const Iron = calculateIron(age, gender);
-    const VitaminC = calculateVitaminC(age);
-    const VitaminD = calculateVitaminD(age);
-    const VitaminE = calculateVitaminE(age);
-    const dailySleepHours = calculateSleepHours(age);
-    const dailyHydration = calculateHydration(age);
+    const Zinc = 25; // mg
+    const Calcium = calculateCalcium(age); // mg
+    const Iron = calculateIron(age, gender); // mg
+    const VitaminC = calculateVitaminC(age); // mg
+    const VitaminD = calculateVitaminD(age); // mg
+    const VitaminE = calculateVitaminE(age); // mg
+    const dailySleepHours = calculateSleepHours(age); // hours
+    const dailyHydration = calculateHydration(age); // cups
     const dailyPhysicalActivity = calculatePhysicalActivity(age);
 
     const protocol = {
-        DCV: DCV ? DCV.toFixed(2) : null,
-        dailyCarbohydrates: dailyCarbohydrates ? dailyCarbohydrates.toFixed(2) : null,
-        dailyProteins: dailyProteins ? dailyProteins.toFixed(2) : null,
-        dailyFats: dailyFats ? dailyFats.toFixed(2) : null,
-        dailyZinc: Zinc,
-        dailyCalcium: Calcium,
-        dailyIron: Iron,
-        dailyVitaminC: VitaminC,
-        dailyVitaminD: VitaminD,
-        dailyVitaminE: VitaminE,
-        dailySleepHours: dailySleepHours,
-        dailyHydration: dailyHydration,
+        DCV: DCV ? `${DCV.toFixed(2)} kcal` : null,
+        dailyCarbohydrates: dailyCarbohydrates ? `${dailyCarbohydrates.toFixed(2)} grams` : null,
+        dailyProteins: dailyProteins ? `${dailyProteins.toFixed(2)} grams` : null,
+        dailyFats: dailyFats ? `${dailyFats.toFixed(2)} grams` : null,
+        dailyZinc: `${Zinc} mg`,
+        dailyCalcium: `${Calcium} mg`,
+        dailyIron: `${Iron} mg`,
+        dailyVitaminC: `${VitaminC} mg`,
+        dailyVitaminD: `${VitaminD} mg`,
+        dailyVitaminE: `${VitaminE} mg`,
+        dailySleepHours: `${dailySleepHours} hours`,
+        dailyHydration: `${dailyHydration} cups`,
         dailyPhysicalActivity: dailyPhysicalActivity,
     };
     
     return protocol;
 };
+
 
 export default ProtocolGenerator;
