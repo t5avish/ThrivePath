@@ -151,6 +151,9 @@ const ProtocolGenerator = ({ gender, age, weight }) => {
     const dailyPhysicalActivity = calculatePhysicalActivity(age);
 
     const protocol = {
+        age: `${age} years old`,
+        gender: gender,
+        weight: `${weight} kg`,
         DCV: DCV ? `${DCV.toFixed(2)} kcal` : null,
         dailyCarbohydrates: dailyCarbohydrates ? `${dailyCarbohydrates.toFixed(2)} grams` : null,
         dailyProteins: dailyProteins ? `${dailyProteins.toFixed(2)} grams` : null,

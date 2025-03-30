@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ProtocolGenerator from "./ProtocolGenerator";
+import ResponseParser from "./ResponseParser";
 
 const AddPatient2 = () => {
   const navigate = useNavigate();
@@ -16,7 +17,6 @@ const AddPatient2 = () => {
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDifference = today.getMonth() - birthDate.getMonth();
     
-    // Adjust age if the birthday hasn't occurred yet this year
     if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
         age--;
     }
@@ -52,7 +52,63 @@ const AddPatient2 = () => {
       alert("You must be logged in to use this feature.");
       return;
     }
-/*
+
+    const prompt = `
+    Based on the following protocol, generate a personalized daily plan divided into 4 sections,
+    using **Markdown formatting** and the same style and structure shown below:
+    ### 1. Daily Meal Plan
+
+    *Breakfast:*
+    - *Option:* ...
+      - *Portion:* ...
+      - *Nutrition:* ...
+    
+    *Lunch:*
+    - *Option:* ...
+      - *Portion:* ...
+      - *Nutrition:* ...
+    
+    *Dinner:*
+    - *Option:* ...
+      - *Portion:* ...
+      - *Nutrition:* ...
+    
+    *Snacks:*
+    - *Option:* ...
+    - *Option:* ...
+    
+    ### 2. Daily Hydration Recommendation
+    
+    - *Total Water:* ... cups of water daily.
+    - *Tips to Stay Hydrated:*
+      - ...
+      - ...
+      - ...
+    
+    ### 3. Physical Activity Plan
+    
+    - *Type:* ...
+    - *Duration:* **Maximum 30 minutes daily**.
+    - *Timing Suggestions:*
+      - *Morning:* ...
+      - *Alternative:* ...
+    - *Muscle-strengthening Activities:* ...
+    
+    ### 4. Sleep Schedule
+    
+    - *Bedtime:* ...
+    - *Wake Time:* ...
+    - *Bedtime Routine Tips:*
+      - ...
+      - ...
+      - ...
+
+      Stick exactly to this formatting, keep the structure clean and easy to read, and avoid adding any extra headings or explanations outside this format.
+    
+    Protocol:
+    ${Object.entries(protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
+    `;
+
     try {
       const response = await fetch("/api/openai", {
         method: "POST",
@@ -61,14 +117,44 @@ const AddPatient2 = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          messages: [{ role: "user", content: "whats 2+2?" }],
+          messages: [{ role: "user", content: prompt }],
         }),
       });
-  
+
       const data = await response.json();
+      
+      const parseAIResponse = require('./ResponseParser.js');
+      const formattedJson = parseAIResponse(data.response);
+
+
       if (response.ok) {
-        console.log("OpenAI Response:", data.response);
-        alert("OpenAI Response: " + data.response);
+        console.log(formattedJson);
+        try {
+          const patientData = {
+            ...location.state,
+            diagnosticFile: file.name,
+            treatment: formattedJson,
+          };
+
+          const saveResponse = await fetch("/api/add-new-patient", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(patientData)
+          });
+
+          if (!saveResponse.ok) {
+            const errorData = await saveResponse.json();
+            throw new Error(errorData.message || "Failed to save patient");
+          }
+
+          navigate("/select-patient");
+        } catch (error) {
+          console.error("Error saving patient:", error);
+          setError(error.message);
+        }
       } else {
         console.error("OpenAI API Error:", data.message);
         alert("Error: " + data.message);
@@ -76,32 +162,6 @@ const AddPatient2 = () => {
     } catch (error) {
       console.error("Request failed:", error);
       alert("Failed to connect to OpenAI API.");
-    }
-  */
-
-    try {
-      const patientData = {
-        ...location.state,
-        diagnosticFile: file.name,
-      };
-      
-      const saveResponse = await fetch("/api/add-new-patient", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(patientData)
-      });
-      if (!saveResponse.ok) {
-        const errorData = await saveResponse.json();
-        throw new Error(errorData.message || "Failed to save patient");
-      }
-
-      navigate("/select-patient");
-    } catch (error) {
-      console.error("Error saving patient:", error);
-      setError(error.message);
     }
   };
 
