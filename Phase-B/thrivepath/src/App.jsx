@@ -6,6 +6,8 @@ import SelectPatient from "./components/PatientsPage/SelectPatient";
 import AddPatient1 from "./components/PatientsPage/AddPatient1";
 import AddPatient2 from "./components/PatientsPage/AddPatient2";
 import TreatmentPage from "./components/PatientDashboard/TreatmentPage";
+import TrackingPage from "./components/PatientDashboard/TrackingPage";
+
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
         <Route path="/add-patient-info" element={<AddPatient1 />} />
         <Route path="/add-patient-file" element={<AddPatient2 />} />
         <Route path="/treatment/:patientId" element={<TreatmentPage />} />
+        <Route path="/tracking/:patientId" element={<TrackingPage />} />
       </Routes>
     </Router>
   );

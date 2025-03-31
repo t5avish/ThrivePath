@@ -84,8 +84,18 @@ const TreatmentPage = () => {
         <div className="container mx-auto flex items-center justify-between">
           <div className="text-blue-600 text-xl font-bold">ThrivePath</div>
           <nav className="flex items-center justify-end gap-8">
-            <a className="text-blue-600 font-medium border-b-2 border-blue-600 pb-1" href="#">Treatment</a>
-            <a className="text-gray-600 hover:text-blue-600 transition-colors" href="#">Tracking</a>
+          <a
+              onClick={() => navigate(`/treatment/${patientId}`)}
+              className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Treatment
+            </a>
+            <a
+              onClick={() => navigate(`/tracking/${patientId}`)}
+              className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Tracking
+            </a>
             <button
               onClick={handleGoBack}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
