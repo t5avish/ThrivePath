@@ -41,7 +41,8 @@ export default async function handler(req, res) {
     res.status(200).json({ 
       patient: {
         name: patient.name,
-        _id: patient._id
+        _id: patient._id,
+        treatment: patient.treatment
       }
     });
   } catch (error) {
