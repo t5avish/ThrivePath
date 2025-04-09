@@ -104,6 +104,7 @@ const AddPatient2 = () => {
       - ...
 
       Stick exactly to this formatting, keep the structure clean and easy to read, and avoid adding any extra headings or explanations outside this format.
+      in the nutrition part give exact numbers. withour approx or ~.
     
     Protocol:
     ${Object.entries(protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
