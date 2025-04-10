@@ -139,6 +139,7 @@ const AddPatient2 = () => {
             ...location.state,
             diagnosticFile: file.name,
             treatment: formattedJson,
+            protocol: protocol,
           };
 
           const saveResponse = await fetch("/api/add-new-patient", {
