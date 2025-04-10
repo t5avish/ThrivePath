@@ -48,6 +48,7 @@ const TreatmentPage = () => {
   }, [patientId, navigate]);
 
   const handleDownloadPlan = () => {
+    console.log(patient)
     alert("Download functionality to be implemented");
   };
 
@@ -128,7 +129,7 @@ const TreatmentPage = () => {
           </button>
         </div>
 
-        <Dashboard treatment={treatment} />
+        <Dashboard treatment={treatment} patient={patient}/>
       </main>
     </div>
   );

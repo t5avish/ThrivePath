@@ -42,7 +42,8 @@ export default async function handler(req, res) {
       patient: {
         name: patient.name,
         _id: patient._id,
-        treatment: patient.treatment
+        treatment: patient.treatment,
+        protocol: patient.protocol,
       }
     });
   } catch (error) {
