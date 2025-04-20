@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "cors": "^2.8.5",
     "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.6.1",
     "mongodb": "^6.15.0",
     "openai": "^4.90.0",
     "react": "^19.0.0",

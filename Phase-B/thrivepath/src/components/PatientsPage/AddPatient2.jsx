@@ -108,6 +108,7 @@ const AddPatient2 = () => {
     
     Stick exactly to this formatting, keep the structure clean and easy to read, and avoid adding any extra headings or explanations outside this format.
     In the nutrition part, give exact numbers, without approximations or "~".
+    Seperate the portion by "," and dont add parentheses.
     
     Protocol:
     ${Object.entries(protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
@@ -130,7 +131,7 @@ const AddPatient2 = () => {
       
       const parseAIResponse = require('./ResponseParser.js');
       const formattedJson = parseAIResponse(data.response);
-
+      const currentDate = new Date().toISOString();
 
       if (response.ok) {
         console.log(formattedJson);
@@ -140,6 +141,13 @@ const AddPatient2 = () => {
             diagnosticFile: file.name,
             treatment: formattedJson,
             protocol: protocol,
+            history: [
+              {
+                date: currentDate,
+                weight: Number(location.state.weight),
+                height: Number(location.state.height),
+              }
+            ]
           };
 
           const saveResponse = await fetch("/api/add-new-patient", {

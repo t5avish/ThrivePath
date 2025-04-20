@@ -51,7 +51,7 @@ function parseAIResponse(markdownString) {
 
 function parseMealPlan(section, result) {
   // Define helper function to parse meal data
-  function parseMeal(mealText, mealType) {
+  function parseMeal(mealText) {
     // Look for option entries which are bullet points after the meal type
     const optionRegex = /-\s+\*Option:\*\s+(.*?)(?=\n|$)/g;
     const prepareRegex = /-\s+\*How to Prepare:\*\s+(.*?)(?=\n|$)/g; // Added regex for 'How to Prepare'
@@ -97,15 +97,15 @@ function parseMealPlan(section, result) {
 
   // Parse each meal section
   if (breakfastSection) {
-    result.dailyMealPlan.breakfast = parseMeal(breakfastSection[1], "breakfast");
+    result.dailyMealPlan.breakfast = parseMeal(breakfastSection[1]);
   }
 
   if (lunchSection) {
-    result.dailyMealPlan.lunch = parseMeal(lunchSection[1], "lunch");
+    result.dailyMealPlan.lunch = parseMeal(lunchSection[1]);
   }
 
   if (dinnerSection) {
-    result.dailyMealPlan.dinner = parseMeal(dinnerSection[1], "dinner");
+    result.dailyMealPlan.dinner = parseMeal(dinnerSection[1]);
   }
 
   // Parse snacks (which have a simpler format)

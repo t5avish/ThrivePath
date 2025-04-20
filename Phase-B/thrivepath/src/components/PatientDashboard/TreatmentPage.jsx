@@ -48,7 +48,6 @@ const TreatmentPage = () => {
   }, [patientId, navigate]);
 
   const handleDownloadPlan = () => {
-    console.log(patient)
     alert("Download functionality to be implemented");
   };
 
@@ -93,7 +92,11 @@ const TreatmentPage = () => {
               Treatment
             </a>
             <a
-              onClick={() => navigate(`/tracking/${patientId}`)}
+                onClick={() =>
+                  navigate(`/tracking/${patientId}`, {
+                    state: { patient },
+                  })
+                }
               className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
             >
               Tracking
