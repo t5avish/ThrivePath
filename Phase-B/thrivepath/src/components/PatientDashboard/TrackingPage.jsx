@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { DateTime } from "luxon";
+import { generateProtocolAndTreatment } from "../../utils/generateProtocolAndTreatment";
 
 const TrackingPage = () => {
   const navigate = useNavigate();
@@ -76,13 +77,24 @@ const TrackingPage = () => {
     const token = localStorage.getItem("token");
 
     try {
+      const { protocol, treatment } = await generateProtocolAndTreatment({
+        birthdate: patient.birthdate,
+        gender: patient.protocol.gender,
+        weight,
+      });
+
       const response = await fetch(`/api/update-patient-history`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ patientId, newEntry: { weight, height } }),
+        body: JSON.stringify({
+          patientId,
+          newEntry: { weight, height },
+          protocol,
+          treatment,
+        }),
       });
 
       const data = await response.json();
@@ -104,6 +116,7 @@ const TrackingPage = () => {
       setShowForm(false);
       setFormWeight("");
       setFormHeight("");
+
       navigate(`/treatment/${patientId}`);
     } catch (error) {
       console.error("Update error:", error);

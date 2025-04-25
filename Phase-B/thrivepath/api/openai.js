@@ -34,7 +34,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "Invalid messages format" });
     }
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
       messages,
     });
 

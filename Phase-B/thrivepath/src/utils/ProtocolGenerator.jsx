@@ -8,7 +8,7 @@ const getMedianWeight = (gender, age) => {
 
 const calculateDailyCalories = (currentWeight, medianWeight) => {
     if (!medianWeight) return null;
-    return 120 * (currentWeight / medianWeight);
+    return 120 * (currentWeight / medianWeight) * currentWeight;
 };
 
 const calculateDailyCarbohydrates = (DCV) => {

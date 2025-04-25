@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import parseAIResponse from "../PatientsPage/ResponseParser";
+import parseAIResponse from "../../utils/ResponseParser"
 
 const MealPlan = ({ dailyMealPlan, patient }) => {
-  const [patientData, setPatientData] = useState(null); // State to store the entire patient object
-  const [loading, setLoading] = useState(false); // State to track loading status
-  const [isMealsVisible, setIsMealsVisible] = useState(true); // State to control meal visibility
+  const [patientData, setPatientData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isMealsVisible, setIsMealsVisible] = useState(true); 
 
-  // Set the patient data when the component is mounted or when the patient prop changes
+  
   useEffect(() => {
     setPatientData(patient);
-  }, [patient]); // The effect runs whenever the 'patient' prop changes
+  }, [patient]);
 
   const parseNutrition = (nutritionString) => {
     const nutritionArray = nutritionString.split(",").map(item => item.trim());
@@ -18,10 +18,10 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
     nutritionArray.forEach(item => {
       const parts = item.split(" ");
       const value = parts[0];
-      const unit = parts.slice(1).join(" "); // Join anything after the first part as the unit
+      const unit = parts.slice(1).join(" ");
 
       if (value && unit) {
-        nutritionData[unit] = value; // Save the value and unit correctly
+        nutritionData[unit] = value;
       }
     });
 
@@ -71,19 +71,21 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   };
 
   const handleRefresh = async () => {
-    setLoading(true); // Start loading
-    setIsMealsVisible(false); // Hide meals while refreshing
+    setLoading(true);
+    setIsMealsVisible(false);
 
     const token = localStorage.getItem("token");
 
     if (!token) {
       alert("You must be logged in to use this feature.");
-      setLoading(false); // End loading if token is missing
+      setLoading(false);
       return;
     }
 
     const prompt = `
-    Based on the following protocol and current treatment plan, generate a personalized daily meal plan divided into 4 sections. Make sure that the new meal plan is different from the existing one provided below. Use **Markdown formatting** and the same style and structure shown.
+    Based on the following protocol and current treatment plan, generate a personalized daily meal plan divided into 4 sections. 
+    Make sure that the new meal plan is different from the existing one provided below. Use **Markdown formatting** and the same style and structure shown.
+    Make sure the output strictly follows the structure shown below and does not deviate in any way.
   
     ### 1. Current Daily Meal Plan (For reference, do not replicate these meals):
     *Breakfast:*
@@ -151,23 +153,18 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
       });
 
       const data = await response.json();
-
-      // Assuming the response contains a 'response' property with markdown content
       const markdownContent = data.response;
 
-      // Parse the markdown content into a structured JSON object
       const newMealPlan = parseAIResponse(markdownContent);
 
-      // Update the patientData state with the new meal plan
       setPatientData((prevData) => ({
         ...prevData,
-        dailyMealPlan: newMealPlan.dailyMealPlan, // Update only the dailyMealPlan
+        dailyMealPlan: newMealPlan.dailyMealPlan,
       }));
 
-      // Prepare the updated treatment object
       const updatedTreatment = {
-        ...patientData.treatment, // Keep the existing treatment data
-        dailyMealPlan: newMealPlan.dailyMealPlan, // Replace only the dailyMealPlan
+        ...patientData.treatment,
+        dailyMealPlan: newMealPlan.dailyMealPlan,
       };
 
       const updateResponse = await fetch("/api/update-treatment", {
@@ -178,7 +175,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
         },
         body: JSON.stringify({
           patientId: patientData._id,
-          updatedTreatment: updatedTreatment, // Send the full treatment but with only the updated dailyMealPlan
+          updatedTreatment: updatedTreatment,
         }),
       });
 
@@ -193,8 +190,8 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
     } catch (error) {
       console.log("Error during API call:", error);
     } finally {
-      setLoading(false); // End loading
-      setIsMealsVisible(true); // Show meals again after refresh
+      setLoading(false);
+      setIsMealsVisible(true);
     }
   };
 
@@ -214,7 +211,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
       <button
         onClick={handleRefresh}
         className="bg-blue-500 text-white py-2 px-4 rounded-full mt-4"
-        disabled={loading} // Disable the button while loading
+        disabled={loading}
       >
         {loading ? "Loading..." : "Refresh Meal Plan"}
       </button>

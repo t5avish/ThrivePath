@@ -24,13 +24,22 @@ export default async function handler(req, res) {
     const decoded = jwt.verify(token, JWT_SECRET);
 
     const db = await connectToDatabase();
-    const { patientId, newEntry } = req.body;
+    const { patientId, newEntry, protocol, treatment } = req.body;
 
-    if (!patientId || !newEntry || typeof newEntry.weight !== 'number' || typeof newEntry.height !== 'number') {
-      return res.status(400).json({ message: 'Invalid input data' });
+    if (
+      !patientId ||
+      !newEntry ||
+      typeof newEntry.weight !== 'number' ||
+      typeof newEntry.height !== 'number' ||
+      !protocol ||
+      !treatment
+    ) {
+      return res.status(400).json({
+        message: 'Missing or invalid required fields: patientId, newEntry, protocol, or treatment',
+      });
     }
 
-    const date = newEntry.date || new Date().toISOString(); // Use UTC date
+    const date = newEntry.date || new Date().toISOString();
 
     const patient = await db.collection('patients').findOne({
       _id: new ObjectId(patientId),
@@ -51,16 +60,20 @@ export default async function handler(req, res) {
             date,
           },
         },
+        $set: {
+          protocol,
+          treatment,
+        },
       }
     );
 
     if (updateResult.modifiedCount > 0) {
-      return res.status(200).json({ message: 'Patient history updated' });
+      return res.status(200).json({ message: 'Patient history, protocol, and treatment updated successfully' });
     } else {
-      return res.status(400).json({ message: 'Failed to update patient history' });
+      return res.status(400).json({ message: 'Failed to update patient record' });
     }
   } catch (error) {
-    console.error('Error updating patient history:', error);
+    console.error('Error updating patient:', error);
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ message: 'Invalid token' });
     }

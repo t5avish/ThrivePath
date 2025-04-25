@@ -1,32 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import ProtocolGenerator from "./ProtocolGenerator";
-import ResponseParser from "./ResponseParser";
+import { generateProtocolAndTreatment } from "../../utils/generateProtocolAndTreatment";
 
 const AddPatient2 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
-
-  const { birthdate, gender, weight } = location.state || {};
-
-  function calculateAge(birthdate) {
-    const today = new Date();
-    const birthDate = new Date(birthdate);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-    return age;
-  }
-
-  const age = calculateAge(birthdate);
-  const patientData = { age, gender, weight };
-
-  const protocol = ProtocolGenerator(patientData);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -45,137 +25,54 @@ const AddPatient2 = () => {
       alert("Please upload a file before completing the process.");
       return;
     }
-    
-    const token = localStorage.getItem("token");
 
+    const token = localStorage.getItem("token");
     if (!token) {
       alert("You must be logged in to use this feature.");
       return;
     }
-    const prompt = `
-    Based on the following protocol, generate a personalized daily plan divided into 4 sections,
-    using **Markdown formatting** and the same style and structure shown below:
-    
-    ### 1. Daily Meal Plan
-    
-    *Breakfast:*
-    - *Option:* ...
-      - *Portion:* ...
-      - *Nutrition:* ...
-      - *How to Prepare:* ...
-    
-    *Lunch:*
-    - *Option:* ...
-      - *Portion:* ...
-      - *Nutrition:* ...
-      - *How to Prepare:* ...
-    
-    *Dinner:*
-    - *Option:* ...
-      - *Portion:* ...
-      - *Nutrition:* ...
-      - *How to Prepare:* ...
-    
-    *Snacks:*
-    - *Option:* ...
-    - *Option:* ...
-    
-    ### 2. Daily Hydration Recommendation
-    
-    - *Total Water:* ... cups of water daily.
-    - *Tips to Stay Hydrated:*
-      - ...
-      - ...
-      - ...
-    
-    ### 3. Physical Activity Plan
-    
-    - *Type:* ...
-    - *Duration:* **Maximum 30 minutes daily**.
-    - *Timing Suggestions:*
-      - *Morning:* ...
-      - *Alternative:* ...
-    - *Muscle-strengthening Activities:* ...
-    
-    ### 4. Sleep Schedule
-    
-    - *Bedtime:* ...
-    - *Wake Time:* ...
-    - *Bedtime Routine Tips:*
-      - ...
-      - ...
-      - ...
-    
-    Stick exactly to this formatting, keep the structure clean and easy to read, and avoid adding any extra headings or explanations outside this format.
-    In the nutrition part, give exact numbers, without approximations or "~".
-    Seperate the portion by "," and dont add parentheses.
-    
-    Protocol:
-    ${Object.entries(protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
-    `;
-    
 
     try {
-      const response = await fetch("/api/openai", {
+      const { protocol, treatment } = await generateProtocolAndTreatment({
+        birthdate: location.state.birthdate,
+        gender: location.state.gender,
+        weight: location.state.weight,
+      });
+
+      const currentDate = new Date().toISOString();
+
+      const patientData = {
+        ...location.state,
+        diagnosticFile: file.name,
+        treatment,
+        protocol,
+        history: [
+          {
+            date: currentDate,
+            weight: Number(location.state.weight),
+            height: Number(location.state.height),
+          },
+        ],
+      };
+
+      const saveResponse = await fetch("/api/add-new-patient", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: prompt }],
-        }),
+        body: JSON.stringify(patientData),
       });
 
-      const data = await response.json();
-      
-      const parseAIResponse = require('./ResponseParser.js');
-      const formattedJson = parseAIResponse(data.response);
-      const currentDate = new Date().toISOString();
-
-      if (response.ok) {
-        console.log(formattedJson);
-        try {
-          const patientData = {
-            ...location.state,
-            diagnosticFile: file.name,
-            treatment: formattedJson,
-            protocol: protocol,
-            history: [
-              {
-                date: currentDate,
-                weight: Number(location.state.weight),
-                height: Number(location.state.height),
-              }
-            ]
-          };
-
-          const saveResponse = await fetch("/api/add-new-patient", {
-            method: "POST",
-            headers: { 
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(patientData)
-          });
-
-          if (!saveResponse.ok) {
-            const errorData = await saveResponse.json();
-            throw new Error(errorData.message || "Failed to save patient");
-          }
-
-          navigate("/select-patient");
-        } catch (error) {
-          console.error("Error saving patient:", error);
-          setError(error.message);
-        }
-      } else {
-        console.error("OpenAI API Error:", data.message);
-        alert("Error: " + data.message);
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        throw new Error(errorData.message || "Failed to save patient");
       }
+
+      navigate("/select-patient");
     } catch (error) {
-      console.error("Request failed:", error);
-      alert("Failed to connect to OpenAI API.");
+      console.error("Error saving patient:", error);
+      setError(error.message);
     }
   };
 
