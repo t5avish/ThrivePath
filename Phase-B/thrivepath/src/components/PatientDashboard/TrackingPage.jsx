@@ -64,6 +64,11 @@ const TrackingPage = () => {
     navigate("/select-patient");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/signin");
+  };
+
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     const weight = parseFloat(formWeight);
@@ -133,6 +138,12 @@ const TrackingPage = () => {
             <a onClick={() => navigate(`/treatment/${patientId}`)} className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Treatment</a>
             <a onClick={() => navigate(`/tracking/${patientId}`)} className="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1 cursor-pointer">Tracking</a>
             <button onClick={handleGoBack} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Back to Patients</button>
+            <button
+              onClick={handleLogout}
+              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors shadow-sm"
+            >
+              Logout
+            </button>
           </nav>
         </div>
       </header>

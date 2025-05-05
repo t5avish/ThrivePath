@@ -49,6 +49,11 @@ const SelectPatient = () => {
     navigate("/add-patient-info");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/signin");
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -60,7 +65,15 @@ const SelectPatient = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center text-blue-600 mb-6">Select a Child</h1>
+        <div className="relative mb-6">
+          <h1 className="text-2xl font-bold text-blue-600 text-center">Select a Child</h1>
+          <button 
+            onClick={handleLogout}
+            className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition text-sm absolute right-0 top-1"
+          >
+            Logout
+          </button>
+        </div>
         
         {error && (
           <div className="mb-4 text-red-600 text-center">

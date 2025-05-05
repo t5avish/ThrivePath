@@ -55,6 +55,11 @@ const TreatmentPage = () => {
     navigate("/select-patient");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/signin");
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -87,7 +92,7 @@ const TreatmentPage = () => {
           <nav className="flex items-center justify-end gap-8">
             <a
               onClick={() => navigate(`/treatment/${patientId}`)}
-              className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
+              className="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1 cursor-pointer"
             >
               Treatment
             </a>
@@ -106,6 +111,12 @@ const TreatmentPage = () => {
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
             >
               Back to Patients
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors shadow-sm"
+            >
+              Logout
             </button>
           </nav>
         </div>
