@@ -5,8 +5,8 @@ import { generateProtocolAndTreatment } from "../../utils/generateProtocolAndTre
 const AddPatient2 = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [file, setFile] = useState(null);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -15,20 +15,14 @@ const AddPatient2 = () => {
     }
   }, [navigate]);
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!file) {
-      alert("Please upload a file before completing the process.");
-      return;
-    }
+    setIsLoading(true);
 
     const token = localStorage.getItem("token");
     if (!token) {
       alert("You must be logged in to use this feature.");
+      setIsLoading(false);
       return;
     }
 
@@ -43,7 +37,6 @@ const AddPatient2 = () => {
 
       const patientData = {
         ...location.state,
-        diagnosticFile: file.name,
         treatment,
         protocol,
         history: [
@@ -73,6 +66,8 @@ const AddPatient2 = () => {
     } catch (error) {
       console.error("Error saving patient:", error);
       setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,12 +85,12 @@ const AddPatient2 = () => {
           </div>
           <div className="flex justify-between mt-2 text-sm">
             <span className="text-blue-600 font-medium">General Information</span>
-            <span className="text-blue-600 font-medium">Upload a diagnostic file</span>
+            <span className="text-blue-600 font-medium">Diagnostic Information</span>
           </div>
         </div>
 
         <h1 className="text-2xl font-bold text-center text-blue-600 mb-6">Add New Child</h1>
-        <p className="text-gray-700 text-center mb-8">Step 2: Upload a diagnostic file</p>
+        <p className="text-gray-700 text-center mb-8">Step 2: Diagnostic Information</p>
 
         {error && (
           <div className="mb-4 text-red-600 text-center">{error}</div>
@@ -103,23 +98,38 @@ const AddPatient2 = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg">
-            <p className="mt-1 text-sm text-gray-600">Click to upload or drag and drop</p>
-            <p className="mt-1 text-xs text-gray-500">CSV file up to 10MB</p>
-            <input type="file" accept=".csv" id="file-upload" name="file-upload" className="hidden" onChange={handleFileChange} />
-            <button type="button" onClick={() => document.getElementById("file-upload").click()}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-              Select File
-            </button>
-            {file && <p className="mt-2 text-sm text-gray-700">Selected File: {file.name}</p>}
+            <div className="text-center">
+              <p className="text-lg font-medium text-gray-700">Diagnostic File</p>
+              <p className="mt-2 text-gray-600">To be decided</p>
+              <p className="mt-1 text-sm text-gray-500">This feature will be implemented later</p>
+            </div>
           </div>
 
           <div className="flex justify-between pt-6">
-            <button type="button" onClick={() => navigate("/add-child-step-1", { state: location.state })}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            <button 
+              type="button" 
+              onClick={() => navigate("/add-child-step-1", { state: location.state })}
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              disabled={isLoading}
+            >
               Previous Step
             </button>
-            <button type="submit" className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
-              Complete
+            <button 
+              type="submit" 
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Building user profile and treatment...
+                </div>
+              ) : (
+                "Complete"
+              )}
             </button>
           </div>
         </form>
