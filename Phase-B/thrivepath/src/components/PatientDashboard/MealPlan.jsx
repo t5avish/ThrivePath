@@ -5,11 +5,12 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isMealsVisible, setIsMealsVisible] = useState(true); 
-
+  const [currentMealPlan, setCurrentMealPlan] = useState(dailyMealPlan);
   
   useEffect(() => {
     setPatientData(patient);
-  }, [patient]);
+    setCurrentMealPlan(dailyMealPlan);
+  }, [patient, dailyMealPlan]);
 
   const parseNutrition = (nutritionString) => {
     const nutritionArray = nutritionString.split(",").map(item => item.trim());
@@ -89,25 +90,25 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   
     ### 1. Current Daily Meal Plan (For reference, do not replicate these meals):
     *Breakfast:*
-    - *Option:* ${dailyMealPlan.breakfast[0].option}
-    - *Portion:* ${dailyMealPlan.breakfast[0].portion}
-    - *Nutrition:* ${dailyMealPlan.breakfast[0].nutrition}
-    - *How to Prepare:* ${dailyMealPlan.breakfast[0].preparation}
+    - *Option:* ${currentMealPlan.breakfast[0].option}
+    - *Portion:* ${currentMealPlan.breakfast[0].portion}
+    - *Nutrition:* ${currentMealPlan.breakfast[0].nutrition}
+    - *How to Prepare:* ${currentMealPlan.breakfast[0].preparation}
   
     *Lunch:*
-    - *Option:* ${dailyMealPlan.lunch[0].option}
-    - *Portion:* ${dailyMealPlan.lunch[0].portion}
-    - *Nutrition:* ${dailyMealPlan.lunch[0].nutrition}
-    - *How to Prepare:* ${dailyMealPlan.lunch[0].preparation}
+    - *Option:* ${currentMealPlan.lunch[0].option}
+    - *Portion:* ${currentMealPlan.lunch[0].portion}
+    - *Nutrition:* ${currentMealPlan.lunch[0].nutrition}
+    - *How to Prepare:* ${currentMealPlan.lunch[0].preparation}
   
     *Dinner:*
-    - *Option:* ${dailyMealPlan.dinner[0].option}
-    - *Portion:* ${dailyMealPlan.dinner[0].portion}
-    - *Nutrition:* ${dailyMealPlan.dinner[0].nutrition}
-    - *How to Prepare:* ${dailyMealPlan.dinner[0].preparation}
+    - *Option:* ${currentMealPlan.dinner[0].option}
+    - *Portion:* ${currentMealPlan.dinner[0].portion}
+    - *Nutrition:* ${currentMealPlan.dinner[0].nutrition}
+    - *How to Prepare:* ${currentMealPlan.dinner[0].preparation}
   
     *Snacks:*
-    - *Option:* ${dailyMealPlan.snacks[0].option}
+    - *Option:* ${currentMealPlan.snacks[0].option}
   
     ### 2. New Daily Meal Plan (Generate a new, different meal plan):
   
@@ -157,10 +158,18 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
 
       const newMealPlan = parseAIResponse(markdownContent);
 
-      setPatientData((prevData) => ({
-        ...prevData,
-        dailyMealPlan: newMealPlan.dailyMealPlan,
-      }));
+      // Update the local state with the new meal plan
+      setCurrentMealPlan(newMealPlan.dailyMealPlan);
+
+      const updatedPatientData = {
+        ...patientData,
+        treatment: {
+          ...patientData.treatment,
+          dailyMealPlan: newMealPlan.dailyMealPlan,
+        }
+      };
+      
+      setPatientData(updatedPatientData);
 
       const updatedTreatment = {
         ...patientData.treatment,
@@ -195,7 +204,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
     }
   };
 
-  if (!dailyMealPlan) return null;
+  if (!currentMealPlan) return null;
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md font-sans">
@@ -237,7 +246,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
               <h3 className="text-lg font-bold text-gray-900">Breakfast</h3>
             </div>
 
-            {dailyMealPlan.breakfast.map((item, index) => (
+            {currentMealPlan.breakfast.map((item, index) => (
               <div key={index} className="flex flex-col space-y-4">
                 <div className="text-gray-800 font-bold text-lg tracking-tight">{item.option}</div>
                 <ul className="list-disc pl-5 space-y-2">
@@ -265,7 +274,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
               <h3 className="text-lg font-bold text-gray-900">Lunch</h3>
             </div>
 
-            {dailyMealPlan.lunch.map((item, index) => (
+            {currentMealPlan.lunch.map((item, index) => (
               <div key={index} className="flex flex-col space-y-4">
                 <div className="text-gray-800 font-bold text-lg tracking-tight">{item.option}</div>
                 <ul className="list-disc pl-5 space-y-2">
@@ -293,7 +302,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
               <h3 className="text-lg font-bold text-gray-900">Dinner</h3>
             </div>
 
-            {dailyMealPlan.dinner.map((item, index) => (
+            {currentMealPlan.dinner.map((item, index) => (
               <div key={index} className="flex flex-col space-y-4">
                 <div className="text-gray-800 font-bold text-lg tracking-tight">{item.option}</div>
                 <ul className="list-disc pl-5 space-y-2">
