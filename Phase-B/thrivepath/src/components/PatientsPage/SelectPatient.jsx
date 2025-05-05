@@ -6,6 +6,8 @@ const SelectPatient = () => {
   const [patients, setPatients] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -53,6 +55,43 @@ const SelectPatient = () => {
     localStorage.removeItem("token");
     navigate("/signin");
   };
+  
+  const handleDeleteClick = (patient) => {
+    setPatientToDelete(patient);
+    setShowDeleteConfirm(true);
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (!patientToDelete) return;
+    
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("/api/delete-patient", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ patientId: patientToDelete._id }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to delete patient");
+      }
+      
+      setPatients(patients.filter(p => p._id !== patientToDelete._id));
+      setShowDeleteConfirm(false);
+      setPatientToDelete(null);
+    } catch (err) {
+      console.error("Error deleting patient:", err);
+      setError("Failed to delete patient. Please try again.");
+    }
+  };
+  
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setPatientToDelete(null);
+  };
 
   if (isLoading) {
     return (
@@ -91,11 +130,18 @@ const SelectPatient = () => {
           {patients.map((patient) => (
             <div key={patient._id} className="flex items-center justify-between p-4 border rounded-lg">
               <span className="text-gray-800 font-medium">{patient.name}</span>
-              <button 
-                onClick={() => handleSelect(patient._id)}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
-                Select
-              </button>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => handleDeleteClick(patient)}
+                  className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition text-sm">
+                  Delete
+                </button>
+                <button 
+                  onClick={() => handleSelect(patient._id)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
+                  Select
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -108,6 +154,32 @@ const SelectPatient = () => {
           </button>
         </div>
       </div>
+      
+      {/* Delete confirmation modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Deletion</h3>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete {patientToDelete?.name}? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleCancelDelete}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
