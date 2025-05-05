@@ -1,6 +1,6 @@
-import { connectToDatabase } from '../../lib/mongodb';
+import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
-import cors from '../../lib/cors';
+import cors from '../lib/cors';
 import { ObjectId } from 'mongodb';
 
 const JWT_SECRET = process.env.JWT_SECRET;
