@@ -9,6 +9,7 @@ const TreatmentPage = () => {
   const [treatment, setTreatment] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -60,6 +61,10 @@ const TreatmentPage = () => {
     navigate("/signin");
   };
 
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -77,7 +82,7 @@ const TreatmentPage = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-red-600 p-4 bg-red-50 rounded-lg border border-red-200">
+        <div className="text-red-600 p-4 bg-red-50 rounded-lg border border-red-200 mx-4">
           <span className="font-medium">Error:</span> {error}
         </div>
       </div>
@@ -86,10 +91,33 @@ const TreatmentPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="border-b border-gray-200 px-6 py-4 bg-white shadow-sm">
+      <header className="border-b border-gray-200 px-3 md:px-6 py-3 md:py-4 bg-white shadow-sm">
         <div className="container mx-auto flex items-center justify-between">
           <div className="text-blue-600 text-xl font-bold">ThrivePath</div>
-          <nav className="flex items-center justify-end gap-8">
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-1 rounded-md hover:bg-gray-100"
+            onClick={toggleMenu}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6 text-gray-600" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M4 6h16M4 12h16M4 18h16" 
+              />
+            </svg>
+          </button>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center justify-end gap-8">
             <a
               onClick={() => navigate(`/treatment/${patientId}`)}
               className="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1 cursor-pointer"
@@ -97,11 +125,11 @@ const TreatmentPage = () => {
               Treatment
             </a>
             <a
-                onClick={() =>
-                  navigate(`/tracking/${patientId}`, {
-                    state: { patient },
-                  })
-                }
+              onClick={() =>
+                navigate(`/tracking/${patientId}`, {
+                  state: { patient },
+                })
+              }
               className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
             >
               Tracking
@@ -120,17 +148,63 @@ const TreatmentPage = () => {
             </button>
           </nav>
         </div>
+        
+        {/* Mobile Navigation Menu */}
+        {menuOpen && (
+          <div className="md:hidden py-2 px-4 border-t border-gray-100 bg-white mt-2">
+            <div className="space-y-2">
+              <a
+                onClick={() => {
+                  navigate(`/treatment/${patientId}`);
+                  setMenuOpen(false);
+                }}
+                className="block py-2 px-2 text-blue-600 font-semibold rounded bg-blue-50"
+              >
+                Treatment
+              </a>
+              <a
+                onClick={() => {
+                  navigate(`/tracking/${patientId}`, {
+                    state: { patient },
+                  });
+                  setMenuOpen(false);
+                }}
+                className="block py-2 px-2 text-gray-600 hover:text-blue-600 transition-colors"
+              >
+                Tracking
+              </a>
+              <button
+                onClick={() => {
+                  handleGoBack();
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left py-2 px-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+              >
+                Back to Patients
+              </button>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left py-2 px-2 text-gray-600 hover:bg-gray-50 rounded transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
-      <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="flex items-center justify-between mb-8">
+      <main className="flex-1 container mx-auto py-4 md:py-8 px-3 md:px-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8 gap-3 md:gap-0">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Treatment Plan</h1>
-            <p className="text-gray-600">Personalized recommendations for {patient?.name}</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Treatment Plan</h1>
+            <p className="text-sm md:text-base text-gray-600">Personalized recommendations for {patient?.name}</p>
           </div>
           <button
             onClick={handleDownloadPlan}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center md:justify-start gap-2 shadow-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path

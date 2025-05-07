@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -54,85 +55,87 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold text-center text-blue-600">Sign Up</h2>
-        <p className="text-gray-600 text-center mt-2">Create your account</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6">
+      <div className="w-full max-w-md bg-white p-5 sm:p-8 rounded-lg shadow-md">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-600">Sign Up</h2>
+          <p className="text-gray-600 text-sm sm:text-base mt-2">Create your account</p>
+        </div>
 
         {/* Success and Error Messages */}
         {errorMessage && (
-          <div className="bg-red-100 text-red-700 p-3 rounded-md mt-4 text-center">
+          <div className="bg-red-100 text-red-700 p-3 rounded-md mt-4 text-center text-sm sm:text-base">
             {errorMessage}
           </div>
         )}
         {successMessage && (
-          <div className="bg-green-100 text-green-700 p-3 rounded-md mt-4 text-center">
+          <div className="bg-green-100 text-green-700 p-3 rounded-md mt-4 text-center text-sm sm:text-base">
             {successMessage}
           </div>
         )}
 
         <form className="mt-6" onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium">Full Name</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Full Name</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 sm:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium">Email</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 sm:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium">Password</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Password</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 sm:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium">Confirm Password</label>
+          <div className="mb-5">
+            <label className="block text-gray-700 text-sm font-medium mb-1">Confirm Password</label>
             <input
               type="password"
               name="confirm_password"
               value={formData.confirm_password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 sm:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base font-medium"
           >
             Sign Up
           </button>
         </form>
 
-        <p className="mt-4 text-center text-gray-600">
+        <p className="mt-5 text-center text-gray-600 text-sm sm:text-base">
           Already have an account?{" "}
-          <a href="/signin" className="text-blue-500 hover:underline">
+          <Link to="/signin" className="text-blue-500 hover:underline font-medium">
             Sign In
-          </a>
+          </Link>
         </p>
       </div>
     </div>

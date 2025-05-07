@@ -18,6 +18,7 @@ const TrackingPage = () => {
   const { patientId } = useParams();
   const location = useLocation();
   const patient = location.state?.patient;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [historyData, setHistoryData] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -67,6 +68,10 @@ const TrackingPage = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/signin");
+  };
+  
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
   };
 
   const handleSubmitForm = async (e) => {
@@ -131,10 +136,33 @@ const TrackingPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 relative">
-      <header className="border-b border-gray-200 px-6 py-4 bg-white shadow-sm">
+      <header className="border-b border-gray-200 px-3 md:px-6 py-3 md:py-4 bg-white shadow-sm">
         <div className="container mx-auto flex items-center justify-between">
           <div className="text-blue-600 text-xl font-bold">ThrivePath</div>
-          <nav className="flex items-center justify-end gap-8">
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-1 rounded-md hover:bg-gray-100"
+            onClick={toggleMenu}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6 text-gray-600" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M4 6h16M4 12h16M4 18h16" 
+              />
+            </svg>
+          </button>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center justify-end gap-8">
             <a onClick={() => navigate(`/treatment/${patientId}`)} className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Treatment</a>
             <a onClick={() => navigate(`/tracking/${patientId}`)} className="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1 cursor-pointer">Tracking</a>
             <button onClick={handleGoBack} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Back to Patients</button>
@@ -146,59 +174,110 @@ const TrackingPage = () => {
             </button>
           </nav>
         </div>
+        
+        {/* Mobile Navigation Menu */}
+        {menuOpen && (
+          <div className="md:hidden py-2 px-4 border-t border-gray-100 bg-white mt-2">
+            <div className="space-y-2">
+              <a
+                onClick={() => {
+                  navigate(`/treatment/${patientId}`);
+                  setMenuOpen(false);
+                }}
+                className="block py-2 px-2 text-gray-600 hover:text-blue-600 transition-colors"
+              >
+                Treatment
+              </a>
+              <a
+                onClick={() => {
+                  navigate(`/tracking/${patientId}`);
+                  setMenuOpen(false);
+                }}
+                className="block py-2 px-2 text-blue-600 font-semibold rounded bg-blue-50"
+              >
+                Tracking
+              </a>
+              <button
+                onClick={() => {
+                  handleGoBack();
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left py-2 px-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+              >
+                Back to Patients
+              </button>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left py-2 px-2 text-gray-600 hover:bg-gray-50 rounded transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
-      <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="flex items-center justify-between mb-8">
+      <main className="flex-1 container mx-auto py-4 md:py-6 px-3 md:px-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8 gap-3 md:gap-0">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Growth Tracking</h1>
-            <p className="text-gray-600">Visual insights of weight and height over time</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Growth Tracking</h1>
+            <p className="text-gray-600 text-sm md:text-base">Visual insights of weight and height over time</p>
           </div>
 
           <button
             onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center md:justify-start gap-2"
           >
-            Update Physical Measurements
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
+            </svg>
+            Update Measurements
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Weight Over Time</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={historyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="weight" name="Weight (kg)" stroke="#22c55e" strokeWidth={3} dot={{ stroke: '#22c55e', strokeWidth: 2, r: 6, fill: '#fff' }} />
-                <Line type="monotone" dataKey="targetWeight" name="Target Weight" stroke="#ef4444" strokeDasharray="6 6" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
+        <div className="grid grid-cols-1 gap-6">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Weight Over Time</h2>
+            <div className="h-64 sm:h-80 md:h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={historyData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Line type="monotone" dataKey="weight" name="Weight (kg)" stroke="#22c55e" strokeWidth={3} dot={{ stroke: '#22c55e', strokeWidth: 2, r: 4, fill: '#fff' }} />
+                  <Line type="monotone" dataKey="targetWeight" name="Target Weight" stroke="#ef4444" strokeDasharray="6 6" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Height Over Time</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={historyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="height" name="Height (cm)" stroke="#3b82f6" strokeWidth={3} dot={{ stroke: '#3b82f6', strokeWidth: 2, r: 6, fill: '#fff' }} />
-                <Line type="monotone" dataKey="targetHeight" name="Target Height" stroke="#ef4444" strokeDasharray="6 6" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Height Over Time</h2>
+            <div className="h-64 sm:h-80 md:h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={historyData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Line type="monotone" dataKey="height" name="Height (cm)" stroke="#3b82f6" strokeWidth={3} dot={{ stroke: '#3b82f6', strokeWidth: 2, r: 4, fill: '#fff' }} />
+                  <Line type="monotone" dataKey="targetHeight" name="Target Height" stroke="#ef4444" strokeDasharray="6 6" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </main>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white p-5 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm relative">
             <button onClick={() => setShowForm(false)} className="absolute top-2 right-3 text-gray-400 hover:text-red-500 text-xl font-bold">×</button>
             <h2 className="text-lg font-semibold mb-4 text-center text-gray-800">Update Measurements</h2>
             <form onSubmit={handleSubmitForm} className="space-y-4">
@@ -208,7 +287,7 @@ const TrackingPage = () => {
                   type="number"
                   value={formWeight}
                   onChange={(e) => setFormWeight(e.target.value)}
-                  className="w-full border px-3 py-1.5 rounded text-gray-800"
+                  className="w-full border px-3 py-2 rounded text-gray-800"
                   required
                 />
               </div>
@@ -218,7 +297,7 @@ const TrackingPage = () => {
                   type="number"
                   value={formHeight}
                   onChange={(e) => setFormHeight(e.target.value)}
-                  className="w-full border px-3 py-1.5 rounded text-gray-800"
+                  className="w-full border px-3 py-2 rounded text-gray-800"
                   required
                 />
               </div>
