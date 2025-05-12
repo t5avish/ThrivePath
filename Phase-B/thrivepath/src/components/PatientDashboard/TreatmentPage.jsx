@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import html2pdf from "html2pdf.js";
 import Dashboard from "./Dashboard";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const TreatmentPage = () => {
   const navigate = useNavigate();
@@ -53,31 +54,39 @@ const TreatmentPage = () => {
 
   const handleDownloadPlan = () => {
     const element = dashboardRef.current;
-
+  
+    // הסתר זמנית את הכפתור
     const updateBtn = document.getElementById("update-meal-btn");
     const originalDisplay = updateBtn?.style.display;
-    if (updateBtn) {
-      updateBtn.style.display = "none";
-    }
-
-    setTimeout(() => {
-      const options = {
-        margin: 0.5,
-        filename: `${patient?.name || "treatment"}-plan.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "in", format: "a2", orientation: "landscape" },
-      };
-
-      html2pdf()
-        .set(options)
-        .from(element)
-        .save()
-        .then(() => {
-          if (updateBtn) {
-            updateBtn.style.display = originalDisplay || "flex";
-          }
+    if (updateBtn) updateBtn.style.display = "none";
+  
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight,
         });
+  
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+        const imgProps = {
+          width: canvas.width,
+          height: canvas.height,
+        };
+  
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "px",
+          format: [imgProps.width, imgProps.height],
+        });
+  
+        pdf.addImage(imgData, "JPEG", 0, 0, imgProps.width, imgProps.height);
+        pdf.save(`${patient?.name || "treatment"}-plan.pdf`);
+      } finally {
+        // החזרת הכפתור לאחר יצירת ה־PDF
+        if (updateBtn) updateBtn.style.display = originalDisplay || "flex";
+      }
     }, 100);
   };
 
