@@ -108,7 +108,7 @@ const AddPatient2 = () => {
           <div className="flex justify-between pt-4 sm:pt-6">
             <button 
               type="button" 
-              onClick={() => navigate("/add-child-step-1", { state: location.state })}
+              onClick={() => navigate("/add-patient-info", { state: location.state })}
               className="px-3 sm:px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 text-sm sm:text-base"
               disabled={isLoading}
             >
