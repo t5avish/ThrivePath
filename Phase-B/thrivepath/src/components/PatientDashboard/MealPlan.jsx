@@ -72,7 +72,6 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   };
 
   const handleRefresh = async () => {
-    // Existing code remains the same
     setLoading(true);
     setIsMealsVisible(false);
 
@@ -159,7 +158,6 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
 
       const newMealPlan = parseAIResponse(markdownContent);
 
-      // Update the local state with the new meal plan
       setCurrentMealPlan(newMealPlan.dailyMealPlan);
 
       const updatedPatientData = {
@@ -219,8 +217,9 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Daily Meal Plan</h2>
         </div>
         <button
+          id="update-meal-btn"
           onClick={handleRefresh}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-5 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg transition-colors"
+          className="update-button print:hidden flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-5 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg transition-colors"
           disabled={loading}
         >
           {loading ? (

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Dashboard from "./Dashboard"; // adjust the path if needed
+import html2pdf from "html2pdf.js";
+import Dashboard from "./Dashboard";
 
 const TreatmentPage = () => {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ const TreatmentPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const dashboardRef = useRef();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -49,7 +52,33 @@ const TreatmentPage = () => {
   }, [patientId, navigate]);
 
   const handleDownloadPlan = () => {
-    alert("Download functionality to be implemented");
+    const element = dashboardRef.current;
+
+    const updateBtn = document.getElementById("update-meal-btn");
+    const originalDisplay = updateBtn?.style.display;
+    if (updateBtn) {
+      updateBtn.style.display = "none";
+    }
+
+    setTimeout(() => {
+      const options = {
+        margin: 0.5,
+        filename: `${patient?.name || "treatment"}-plan.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "in", format: "a2", orientation: "landscape" },
+      };
+
+      html2pdf()
+        .set(options)
+        .from(element)
+        .save()
+        .then(() => {
+          if (updateBtn) {
+            updateBtn.style.display = originalDisplay || "flex";
+          }
+        });
+    }, 100);
   };
 
   const handleGoBack = () => {
@@ -94,101 +123,42 @@ const TreatmentPage = () => {
       <header className="border-b border-gray-200 px-3 md:px-6 py-3 md:py-4 bg-white shadow-sm">
         <div className="container mx-auto flex items-center justify-between">
           <div className="text-blue-600 text-xl font-bold">ThrivePath</div>
-          
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden p-1 rounded-md hover:bg-gray-100"
-            onClick={toggleMenu}
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-6 w-6 text-gray-600" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M4 6h16M4 12h16M4 18h16" 
-              />
+
+          <button className="md:hidden p-1 rounded-md hover:bg-gray-100" onClick={toggleMenu}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          
-          {/* Desktop Navigation */}
+
           <nav className="hidden md:flex items-center justify-end gap-8">
-            <a
-              onClick={() => navigate(`/treatment/${patientId}`)}
-              className="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1 cursor-pointer"
-            >
+            <a onClick={() => navigate(`/treatment/${patientId}`)} className="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1 cursor-pointer">
               Treatment
             </a>
-            <a
-              onClick={() =>
-                navigate(`/tracking/${patientId}`, {
-                  state: { patient },
-                })
-              }
-              className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
+            <a onClick={() => navigate(`/tracking/${patientId}`, { state: { patient } })} className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">
               Tracking
             </a>
-            <button
-              onClick={handleGoBack}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-            >
+            <button onClick={handleGoBack} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
               Back to Patients
             </button>
-            <button
-              onClick={handleLogout}
-              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors shadow-sm"
-            >
+            <button onClick={handleLogout} className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors shadow-sm">
               Logout
             </button>
           </nav>
         </div>
-        
-        {/* Mobile Navigation Menu */}
+
         {menuOpen && (
           <div className="md:hidden py-2 px-4 border-t border-gray-100 bg-white mt-2">
             <div className="space-y-2">
-              <a
-                onClick={() => {
-                  navigate(`/treatment/${patientId}`);
-                  setMenuOpen(false);
-                }}
-                className="block py-2 px-2 text-blue-600 font-semibold rounded bg-blue-50"
-              >
+              <a onClick={() => { navigate(`/treatment/${patientId}`); setMenuOpen(false); }} className="block py-2 px-2 text-blue-600 font-semibold rounded bg-blue-50">
                 Treatment
               </a>
-              <a
-                onClick={() => {
-                  navigate(`/tracking/${patientId}`, {
-                    state: { patient },
-                  });
-                  setMenuOpen(false);
-                }}
-                className="block py-2 px-2 text-gray-600 hover:text-blue-600 transition-colors"
-              >
+              <a onClick={() => { navigate(`/tracking/${patientId}`, { state: { patient } }); setMenuOpen(false); }} className="block py-2 px-2 text-gray-600 hover:text-blue-600 transition-colors">
                 Tracking
               </a>
-              <button
-                onClick={() => {
-                  handleGoBack();
-                  setMenuOpen(false);
-                }}
-                className="w-full text-left py-2 px-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-              >
+              <button onClick={() => { handleGoBack(); setMenuOpen(false); }} className="w-full text-left py-2 px-2 text-blue-600 hover:bg-blue-50 rounded transition-colors">
                 Back to Patients
               </button>
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setMenuOpen(false);
-                }}
-                className="w-full text-left py-2 px-2 text-gray-600 hover:bg-gray-50 rounded transition-colors"
-              >
+              <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full text-left py-2 px-2 text-gray-600 hover:bg-gray-50 rounded transition-colors">
                 Logout
               </button>
             </div>
@@ -217,7 +187,9 @@ const TreatmentPage = () => {
           </button>
         </div>
 
-        <Dashboard treatment={treatment} patient={patient}/>
+        <div ref={dashboardRef}>
+          <Dashboard treatment={treatment} patient={patient} />
+        </div>
       </main>
     </div>
   );
