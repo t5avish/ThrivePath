@@ -174,11 +174,6 @@ const TrackingPage = () => {
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="text-blue-600 text-xl font-bold">ThrivePath</div>
-            {patient && (
-              <span className="hidden md:inline-block text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                Patient: {patient.name || patientId}
-              </span>
-            )}
           </div>
           
           <button className="md:hidden p-2 rounded-md hover:bg-gray-100" onClick={() => setMenuOpen(!menuOpen)}>

@@ -25,9 +25,6 @@ const SleepSchedule = ({ sleep }) => {
 
       <div className="p-3 md:p-4 bg-indigo-50 rounded-lg">
         <h3 className="font-medium text-indigo-900 mb-3 flex items-center">
-          <svg className="h-4 w-4 md:h-5 md:w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3z..." />
-          </svg>
           Routine Tips
         </h3>
         <div className="space-y-2">

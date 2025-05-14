@@ -26,9 +26,6 @@ const Hydration = ({ hydration }) => {
 
       <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-100">
         <h3 className="font-medium text-blue-900 mb-2 sm:mb-3 flex items-center">
-          <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="..." />
-          </svg>
           Hydration Tips
         </h3>
         <div className="space-y-2">
