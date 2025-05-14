@@ -31,11 +31,11 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
 
   const renderNutrition = (nutritionData) => {
     return Object.entries(nutritionData).map(([key, value], index) => (
-      <div key={index} className="flex items-center p-2 mx-1 border rounded-lg bg-gray-50 shadow-sm text-xs sm:text-sm">
-        <div className="font-semibold text-gray-800">
-          {value} <span className="text-gray-600 font-medium">{key.includes('(') ? '' : key}</span>
+      <div key={index} className="flex items-center px-3 py-2 rounded-md bg-gray-50 shadow-sm text-xs sm:text-sm border border-gray-200">
+        <div className="font-medium text-gray-800">
+          {value} <span className="text-gray-600">{key.includes('(') ? '' : key}</span>
         </div>
-        <div className="text-xs text-gray-500 italic">
+        <div className="text-xs text-gray-500 ml-1">
           {key.includes('(') ? key : ''}
         </div>
       </div>
@@ -47,7 +47,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
     if (match) {
       const [_, quantity, connecting, item] = match;
       return (
-        <li className="mb-2 leading-relaxed text-sm sm:text-base">
+        <li className="mb-2 leading-relaxed text-sm sm:text-base flex items-baseline">
           <span className="text-gray-900 font-medium">{quantity}</span>
           <span className="text-gray-600"> {connecting} </span>
           <span className="text-gray-800">{item}</span>
