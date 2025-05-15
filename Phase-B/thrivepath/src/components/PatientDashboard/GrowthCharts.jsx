@@ -3,17 +3,15 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, Legend,
   CartesianGrid, ResponsiveContainer
 } from "recharts";
-import { DateTime } from "luxon";
 
 const CustomXAxisTick = ({ x, y, payload }) => {
-  const dateTime = DateTime.fromFormat(payload.value, "dd/MM/yyyy HH:mm:ss");
   return (
     <g transform={`translate(${x},${y})`}>
       <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
-        {dateTime.toFormat('dd/MM')}
+        {parseFloat(payload.value).toFixed(1)}
       </text>
       <text x={0} y={16} dy={12} textAnchor="middle" fontSize={10} fill="#666">
-        {dateTime.toFormat('HH:mm')}
+        years
       </text>
     </g>
   );
@@ -21,11 +19,10 @@ const CustomXAxisTick = ({ x, y, payload }) => {
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
-    const dateTime = DateTime.fromFormat(label, "dd/MM/yyyy HH:mm:ss");
     return (
       <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
-        <p className="font-bold text-gray-800 mb-2">{dateTime.toFormat('dd/MM/yyyy')}</p>
-        <p className="text-sm text-gray-600 mb-3">{dateTime.toFormat('HH:mm:ss')}</p>
+        <p className="font-bold text-gray-800 mb-2">Age: {parseFloat(label).toFixed(2)} years</p>
+        <p className="text-sm text-gray-600 mb-3">Recorded: {payload[0]?.payload?.recordDate}</p>
         {payload.map((entry, index) => (
           <div key={`item-${index}`} className="flex items-center mb-1">
             <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: entry.color }}></div>
@@ -76,7 +73,18 @@ const ChartBlock = ({ title, description, dataKeyActual, dataKeyTarget, strokeCo
     <ResponsiveContainer width="100%" height={350}>
       <LineChart data={historyData} margin={{ top: 10, right: 30, left: 10, bottom: 30 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-        <XAxis dataKey="date" tick={<CustomXAxisTick />} interval="preserveStartEnd" height={60} />
+        <XAxis 
+          dataKey="ageYears" 
+          tick={<CustomXAxisTick />} 
+          interval="preserveStartEnd" 
+          height={60}
+          label={{ 
+            value: "Age (years)", 
+            position: "insideBottom", 
+            offset: -10,
+            style: { textAnchor: 'middle', fill: '#666' }
+          }}
+        />
         <YAxis
           label={{
             value: yLabel,

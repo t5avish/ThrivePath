@@ -50,10 +50,14 @@ const StatsSummary = ({ latestEntry, historyData, onUpdateClick, activeTab, setA
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">
           <div className="text-sm text-gray-500 mb-1">Last Updated</div>
           <div className="text-lg font-bold text-gray-800">
-            {DateTime.fromFormat(latestEntry.date, "dd/MM/yyyy HH:mm:ss").toFormat('dd MMM yyyy')}
+            {latestEntry.recordDate ? 
+              DateTime.fromFormat(latestEntry.recordDate, "dd/MM/yyyy HH:mm:ss").toFormat('dd MMM yyyy') : 
+              "No date available"}
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            {DateTime.fromFormat(latestEntry.date, "dd/MM/yyyy HH:mm:ss").toFormat('HH:mm')}
+            {latestEntry.recordDate ? 
+              DateTime.fromFormat(latestEntry.recordDate, "dd/MM/yyyy HH:mm:ss").toFormat('HH:mm') : 
+              ""}
           </div>
         </div>
 
@@ -61,8 +65,8 @@ const StatsSummary = ({ latestEntry, historyData, onUpdateClick, activeTab, setA
           <div className="text-sm text-gray-500 mb-1">Total Records</div>
           <div className="text-2xl font-bold text-gray-800">{historyData.length}</div>
           <div className="text-xs text-gray-500 mt-1">
-            {historyData.length > 0
-              ? `First record: ${DateTime.fromFormat(historyData[0].date, "dd/MM/yyyy HH:mm:ss").toFormat('dd MMM yyyy')}`
+            {historyData.length > 0 && historyData[0].recordDate
+              ? `First record: ${DateTime.fromFormat(historyData[0].recordDate, "dd/MM/yyyy HH:mm:ss").toFormat('dd MMM yyyy')}`
               : 'No records available'}
           </div>
         </div>

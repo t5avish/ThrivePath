@@ -36,16 +36,24 @@ const TrackingPage = () => {
     if (patient?.history) {
       const formattedData = patient.history.map(entry => {
         const dateObj = DateTime.fromISO(entry.date).setZone("Asia/Jerusalem");
-        const ageMonths = DateTime.fromISO(entry.date).diff(DateTime.fromISO(patient.birthdate), 'months').months;
-        const roundedAge = Math.max(1, Math.min(12, Math.round(ageMonths / 12)));
+        const birthDate = DateTime.fromISO(patient.birthdate);
+        const ageInYears = dateObj.diff(birthDate, 'years').years;
+        const ageMonths = dateObj.diff(birthDate, 'months').months;
+        const roundedAgeYear = Math.max(1, Math.min(12, Math.round(ageMonths / 12)));
+        
         return {
-          date: dateObj.toFormat("dd/MM/yyyy HH:mm:ss"),
+          ageYears: parseFloat(ageInYears.toFixed(2)),
+          recordDate: dateObj.toFormat("dd/MM/yyyy HH:mm:ss"),
           weight: entry.weight,
           height: entry.height,
-          targetWeight: medianWeights[gender]?.[roundedAge] || null,
-          targetHeight: medianHeights[gender]?.[roundedAge] || null
+          targetWeight: medianWeights[gender]?.[roundedAgeYear] || null,
+          targetHeight: medianHeights[gender]?.[roundedAgeYear] || null
         };
       });
+      
+      // Sort data by age to ensure proper chart rendering
+      formattedData.sort((a, b) => a.ageYears - b.ageYears);
+      
       setHistoryData(formattedData);
     }
   }, [patient, patientId, navigate]);
@@ -77,23 +85,28 @@ const TrackingPage = () => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Update failed.");
+      
       const newDate = DateTime.now().toUTC().toISO();
-      const ageMonths = DateTime.now().diff(DateTime.fromISO(patient.birthdate), 'months').months;
-      const roundedAge = Math.max(1, Math.min(12, Math.round(ageMonths / 12)));
+      const dateObj = DateTime.fromISO(newDate).setZone("Asia/Jerusalem");
+      const birthDate = DateTime.fromISO(patient.birthdate);
+      const ageInYears = dateObj.diff(birthDate, 'years').years;
+      const ageMonths = dateObj.diff(birthDate, 'months').months;
+      const roundedAgeYear = Math.max(1, Math.min(12, Math.round(ageMonths / 12)));
+      
       const newEntry = {
-        date: newDate,
+        ageYears: parseFloat(ageInYears.toFixed(2)),
+        recordDate: dateObj.toFormat("dd/MM/yyyy HH:mm:ss"),
         weight,
         height,
-        targetWeight: medianWeights[gender]?.[roundedAge] || null,
-        targetHeight: medianHeights[gender]?.[roundedAge] || null,
+        targetWeight: medianWeights[gender]?.[roundedAgeYear] || null,
+        targetHeight: medianHeights[gender]?.[roundedAgeYear] || null,
       };
-      setHistoryData(prev => [...prev, {
-        date: DateTime.fromISO(newDate).setZone("Asia/Jerusalem").toFormat("dd/MM/yyyy HH:mm:ss"),
-        weight,
-        height,
-        targetWeight: newEntry.targetWeight,
-        targetHeight: newEntry.targetHeight
-      }]);
+      
+      setHistoryData(prev => {
+        const newData = [...prev, newEntry];
+        return newData.sort((a, b) => a.ageYears - b.ageYears);
+      });
+      
       setShowForm(false);
       setFormWeight("");
       setFormHeight("");
