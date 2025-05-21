@@ -3,10 +3,10 @@ import Home from "./components/HomePage/HomePage";
 import SignUp from "./components/HomePage/SignUpPage";
 import SignIn from "./components/HomePage/LogInPage";
 import SelectPatient from "./components/PatientsPage/SelectPatient";
-import AddPatient1 from "./components/PatientsPage/AddPatient1";
-import AddPatient2 from "./components/PatientsPage/AddPatient2";
-import TreatmentPage from "./components/PatientDashboard/TreatmentPage";
-import TrackingPage from "./components/PatientDashboard/TrackingPage";
+import AddPatientInfo from "./components/PatientsPage/AddPatientInfo";
+import AddPatientHistory from "./components/PatientsPage/AddPatientHistory";
+import TreatmentPage from "./components/PatientDashboard/treatment/TreatmentPage";
+import TrackingPage from "./components/PatientDashboard/tracking/TrackingPage";
 
 
 function App() {
@@ -17,8 +17,8 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/select-patient" element={<SelectPatient />} />
-        <Route path="/add-patient-info" element={<AddPatient1 />} />
-        <Route path="/add-patient-file" element={<AddPatient2 />} />
+        <Route path="/add-patient-info" element={<AddPatientInfo />} />
+        <Route path="/add-patient-file" element={<AddPatientHistory />} />
         <Route path="/treatment/:patientId" element={<TreatmentPage />} />
         <Route path="/tracking/:patientId" element={<TrackingPage />} />
       </Routes>

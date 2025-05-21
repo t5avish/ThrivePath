@@ -24,27 +24,11 @@ const StatsSummary = ({ latestEntry, historyData, onUpdateClick, activeTab, setA
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">
           <div className="text-sm text-gray-500 mb-1">Current Weight</div>
           <div className="text-2xl font-bold text-gray-800">{latestEntry.weight} kg</div>
-          {latestEntry.targetWeight && (
-            <div className="text-xs text-gray-500 mt-1">
-              Target: {latestEntry.targetWeight} kg
-              <span className={`ml-2 ${latestEntry.weight >= latestEntry.targetWeight ? 'text-green-500' : 'text-yellow-500'}`}>
-                {latestEntry.weight >= latestEntry.targetWeight ? '✓' : '⚠'}
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">
           <div className="text-sm text-gray-500 mb-1">Current Height</div>
           <div className="text-2xl font-bold text-gray-800">{latestEntry.height} cm</div>
-          {latestEntry.targetHeight && (
-            <div className="text-xs text-gray-500 mt-1">
-              Target: {latestEntry.targetHeight} cm
-              <span className={`ml-2 ${latestEntry.height >= latestEntry.targetHeight ? 'text-green-500' : 'text-yellow-500'}`}>
-                {latestEntry.height >= latestEntry.targetHeight ? '✓' : '⚠'}
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">

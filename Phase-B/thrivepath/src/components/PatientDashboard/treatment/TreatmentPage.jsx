@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Dashboard from "./Dashboard";
+import Dashboard from "../Dashboard";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 

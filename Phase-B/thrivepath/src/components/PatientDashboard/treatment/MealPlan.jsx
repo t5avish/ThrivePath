@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import parseAIResponse from "../../utils/ResponseParser"
+import parseAIResponse from "../../../utils/ResponseParser"
 
 const MealPlan = ({ dailyMealPlan, patient }) => {
   const [patientData, setPatientData] = useState(null);

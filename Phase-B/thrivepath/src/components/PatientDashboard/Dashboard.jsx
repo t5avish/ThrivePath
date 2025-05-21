@@ -1,8 +1,8 @@
 import React from "react";
-import MealPlan from "./MealPlan";
-import PhysicalActivity from "./PhysicalActivity";
-import SleepSchedule from "./SleepSchedule";
-import Hydration from "./Hydration";
+import MealPlan from "./treatment/MealPlan";
+import PhysicalActivity from "./treatment/PhysicalActivity";
+import SleepSchedule from "./treatment/SleepSchedule";
+import Hydration from "./treatment/Hydration";
 
 const Dashboard = ({ treatment, patient, protocol }) => {
   if (!treatment) return (

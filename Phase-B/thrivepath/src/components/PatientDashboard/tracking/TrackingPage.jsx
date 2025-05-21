@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { DateTime } from "luxon";
-import { generateProtocolAndTreatment } from "../../utils/generateProtocolAndTreatment";
+import { generateProtocolAndTreatment } from "../../../utils/generateProtocolAndTreatment";
 import HeaderSection from "./HeaderSection";
 import StatsSummary from "./StatsSummary";
 import GrowthCharts from "./GrowthCharts";

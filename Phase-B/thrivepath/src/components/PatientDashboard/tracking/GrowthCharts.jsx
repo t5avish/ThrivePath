@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, Legend,
   CartesianGrid, ResponsiveContainer
 } from "recharts";
-import percentiles from "../../utils/percentiles.json";
+import percentiles from "../../../utils/percentiles.json";
 
 
 const CHART_COLORS = {
@@ -558,7 +558,7 @@ const ChartBlock = ({
             ))}
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            P50 represents the median (50th percentile). Children above P97 or below P3 may require additional evaluation.
+            P50 represents the median (50th percentile).
           </p>
         </div>
         
