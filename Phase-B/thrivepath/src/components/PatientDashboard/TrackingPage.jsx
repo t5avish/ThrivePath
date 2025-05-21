@@ -44,6 +44,7 @@ const TrackingPage = () => {
         return {
           ageYears: parseFloat(ageInYears.toFixed(2)),
           recordDate: dateObj.toFormat("dd/MM/yyyy HH:mm:ss"),
+          date: entry.date, // Keep original date for reference
           weight: entry.weight,
           height: entry.height,
           targetWeight: medianWeights[gender]?.[roundedAgeYear] || null,
@@ -53,6 +54,9 @@ const TrackingPage = () => {
       
       // Sort data by age to ensure proper chart rendering
       formattedData.sort((a, b) => a.ageYears - b.ageYears);
+      
+      // Log the data to check if ageYears is calculated correctly
+      console.log("Formatted History Data:", formattedData);
       
       setHistoryData(formattedData);
     }
@@ -96,6 +100,7 @@ const TrackingPage = () => {
       const newEntry = {
         ageYears: parseFloat(ageInYears.toFixed(2)),
         recordDate: dateObj.toFormat("dd/MM/yyyy HH:mm:ss"),
+        date: newDate, // Add date for consistency
         weight,
         height,
         targetWeight: medianWeights[gender]?.[roundedAgeYear] || null,
@@ -142,6 +147,7 @@ const TrackingPage = () => {
         <GrowthCharts
           historyData={historyData}
           activeTab={activeTab}
+          birthDate={patient?.birthdate} // Pass as string, not DateTime object
         />
       </main>
 
