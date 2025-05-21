@@ -23,7 +23,6 @@ const AddPatient1 = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [isFormValid, setIsFormValid] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const validate = () => {
@@ -74,15 +73,15 @@ const AddPatient1 = () => {
       errs.weight = "Enter valid weight (2–150 kg).";
     }
 
-    setErrors(errs);
-    setIsFormValid(Object.keys(errs).length === 0);
+    return errs;
   };
 
   useEffect(() => {
     if (hasSubmitted) {
-      validate();
+      const validationErrors = validate();
+      setErrors(validationErrors);
     }
-  }, [formData]);
+  }, [formData, hasSubmitted]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -91,9 +90,13 @@ const AddPatient1 = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setHasSubmitted(true);
-    validate();
-    if (!isFormValid) return;
-    navigate("/add-patient-file", { state: formData });
+    
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    
+    if (Object.keys(validationErrors).length === 0) {
+      navigate("/add-patient-file", { state: formData });
+    }
   };
 
   return (
@@ -190,10 +193,7 @@ const AddPatient1 = () => {
             </button>
             <button
               type="submit"
-              disabled={!isFormValid && hasSubmitted}
-              className={`px-4 py-2 rounded-lg text-white ${
-                !isFormValid && hasSubmitted ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-700"
-              }`}
+              className="px-4 py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-700"
             >
               Next Step
             </button>
