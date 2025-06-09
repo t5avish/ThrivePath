@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./components/HomePage/HomePage";
-import SignUp from "./components/HomePage/SignUpPage";
-import SignIn from "./components/HomePage/LogInPage";
-import SelectPatient from "./components/PatientsPage/SelectPatient";
-import AddPatientInfo from "./components/PatientsPage/AddPatientInfo";
-import AddPatientHistory from "./components/PatientsPage/AddPatientHistory";
-import TreatmentPage from "./components/PatientDashboard/treatment/TreatmentPage";
-import TrackingPage from "./components/PatientDashboard/tracking/TrackingPage";
+import Home from "./components/landing/HomePage";
+import SignUp from "./components/landing/SignUpPage";
+import SignIn from "./components/landing/LogInPage";
+import SelectPatient from "./components/user/SelectPatient";
+import AddPatientInfo from "./components/user/AddPatientInfo";
+import AddPatientHistory from "./components/user/AddPatientHistory";
+import TreatmentPage from "./components/patient/treatment/TreatmentPage";
+import TrackingPage from "./components/patient/tracking/TrackingPage";
 
 
 function App() {
