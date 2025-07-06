@@ -92,7 +92,6 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
     let dateDisplay = '';
     
     try {
-      // Check multiple date sources in order of preference
       if (dataPoint.fixedDate) {
         const date = new Date(dataPoint.fixedDate);
         if (!isNaN(date.getTime())) {
@@ -123,7 +122,7 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
     return (
       <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-xl">
         <div className="flex justify-between items-center mb-3">
-          <p className="font-bold text-gray-800">Age: {formattedAge} years</p>
+          <p className="font-bold text-gray-800">Age: {formattedAge} years    </p>
           {showDateDisplay && <span className="text-xs text-gray-500">{dateDisplay}</span>}
         </div>
         
