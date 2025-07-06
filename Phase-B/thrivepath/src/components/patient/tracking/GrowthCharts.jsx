@@ -121,10 +121,16 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
     
     return (
       <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-xl">
-        <div className="flex justify-between items-center mb-3">
-          <p className="font-bold text-gray-800">Age: {formattedAge} years    </p>
-          {showDateDisplay && <span className="text-xs text-gray-500">{dateDisplay}</span>}
-        </div>
+      <div className="mb-3">
+        <p className="font-bold text-gray-800 text-lg">
+          Age: <span className="ml-1">{formattedAge} years</span>
+        </p>
+        {showDateDisplay && (
+          <p className="text-sm text-gray-500 mt-1">
+            Measured on <span className="font-medium">{dateDisplay}</span>
+          </p>
+        )}
+      </div>
         
         <div className="flex items-center mb-3">
           <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: actualDataPoint.color }}></div>
