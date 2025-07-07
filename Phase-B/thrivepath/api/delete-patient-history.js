@@ -39,11 +39,9 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: 'Patient not found or unauthorized' });
     }
 
-    // Try to find the exact entry first
     const entryToDelete = patient.history?.find(entry => entry.date === date);
 
     if (!entryToDelete) {
-      // If exact match not found, try to find similar dates
       const similarEntries = patient.history?.filter(entry => 
         entry.date.includes(date) || date.includes(entry.date)
       );

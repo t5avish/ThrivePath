@@ -378,41 +378,32 @@ const ChartBlock = ({
 }) => {
   const percentileData = getPercentileLinesData(gender, type);
   
-  // We'll focus on key percentiles for better readability
   const percentiles = ["P3", "P25", "P50", "P75", "P97"];
   
-  // Get min and max ages from actual data to focus the chart
   const actualAges = historyData
     .map(item => item.ageYears)
     .filter(age => !isNaN(age));
   
-  // Define age range based on zoom level
   let minAge, maxAge;
   
   if (zoomLevel === "full") {
-    // Full range
     minAge = 0;
     maxAge = 12;
   } else if (zoomLevel === "custom" && isCustomRange) {
-    // Custom range from input
     minAge = parseFloat(customRange.min);
     maxAge = parseFloat(customRange.max);
   } else if (actualAges.length === 0) {
-    // No data, show default range
     minAge = 0;
     maxAge = 5;
   } else {
-    // Auto zoom to data range with buffer
     minAge = Math.max(0, Math.floor(Math.min(...actualAges)) - 0.5);
     maxAge = Math.min(12, Math.ceil(Math.max(...actualAges)) + 1);
   }
   
-  // Filter data based on the current view range
   const filteredHistoryData = historyData.filter(item => {
     return item.ageYears >= minAge && item.ageYears <= maxAge;
   });
   
-  // Get min and max values for better Y axis scaling
   const allValues = [
     ...filteredHistoryData.map(item => item[dataKeyActual]),
     ...percentileData
@@ -420,16 +411,13 @@ const ChartBlock = ({
       .flatMap(item => percentiles.map(p => item[p]))
   ].filter(Boolean);
   
-  // Calculate reasonable min/max with buffer
   const dataMin = allValues.length > 0 ? Math.min(...allValues) : 0;
   const dataMax = allValues.length > 0 ? Math.max(...allValues) : 100;
   const valueRange = dataMax - dataMin;
   
-  // Add 10% padding above and below the data range
   const minValue = Math.floor(dataMin - (valueRange * 0.1));
   const maxValue = Math.ceil(dataMax + (valueRange * 0.1));
   
-  // Mobile-specific adjustments
   const chartHeight = isMobile ? 350 : 500;
   const chartMargin = isMobile 
     ? { top: 20, right: 15, left: 5, bottom: 40 }
@@ -451,7 +439,6 @@ const ChartBlock = ({
         </div>
       </div>
       
-      {/* Make the chart container have a light background */}
       <div className="bg-gray-50 p-2 sm:p-6">
         {/* Chart container */}
         <ResponsiveContainer width="100%" height={chartHeight}>
@@ -511,11 +498,9 @@ const ChartBlock = ({
                   paddingTop: '5px'
                 }}
                 formatter={(value) => {
-                  // Better formatting for legend labels
                   if (value.startsWith('P')) {
                     return `${value} percentile`;
                   }
-                  // Update patient data line label
                   if (value === "Patient Weight (kg)") {
                     return "Patient Weight";
                   }

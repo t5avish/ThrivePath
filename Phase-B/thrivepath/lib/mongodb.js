@@ -6,7 +6,6 @@ const dbName = process.env.MONGODB_DB;
 let clientPromise;
 
 if (process.env.NODE_ENV === 'development') {
-  // In development mode, use a global variable to cache the client
   if (!global._mongoClientPromise) {
     const client = new MongoClient(uri, {
       useNewUrlParser: true,
@@ -16,7 +15,6 @@ if (process.env.NODE_ENV === 'development') {
   }
   clientPromise = global._mongoClientPromise;
 } else {
-  // In production mode, create a new client instance for each invocation
   const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

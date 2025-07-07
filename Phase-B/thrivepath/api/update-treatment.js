@@ -28,7 +28,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Incomplete data' });
     }
 
-    // Find the patient in the database
     const patient = await db.collection('patients').findOne({ 
       _id: new ObjectId(patientId),
       userId: decoded.userId,
@@ -38,7 +37,6 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: 'Patient not found or unauthorized' });
     }
 
-    // Update the patient's treatment
     const result = await db.collection('patients').updateOne(
       { _id: new ObjectId(patientId), userId: decoded.userId },
       { $set: { treatment: { ...updatedTreatment } } }
