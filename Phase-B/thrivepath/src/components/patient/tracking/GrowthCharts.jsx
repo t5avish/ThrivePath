@@ -1,10 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, Legend,
   CartesianGrid, ResponsiveContainer
 } from "recharts";
 import percentiles from "../../../utils/percentiles.json";
-
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 const CHART_COLORS = {
   weight: {
@@ -150,6 +151,13 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
             </div>
           </div>
         </div>
+        
+        {/* Add delete instruction */}
+        <div className="pt-2 border-t border-gray-200 mt-2">
+          <p className="text-xs text-gray-400 italic">
+            Double click on the checkpoint to delete
+          </p>
+        </div>
       </div>
     );
   }
@@ -175,14 +183,15 @@ const getPercentileLinesData = (gender, type) => {
   return formatted;
 };
 
-const GrowthCharts = ({ historyData, activeTab, birthDate }) => {
+const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, patientId }) => {
+  const navigate = useNavigate();
   const [zoomLevel, setZoomLevel] = React.useState("auto");
   const [customRange, setCustomRange] = React.useState({ min: "", max: "" });
   const [isCustomRange, setIsCustomRange] = React.useState(false);
+  const [deleteModal, setDeleteModal] = React.useState({ isOpen: false, dataPoint: null });
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const processedHistoryData = React.useMemo(() => {
-    console.log("GrowthCharts received data:", historyData);
-    console.log("GrowthCharts received birthDate:", birthDate);
     
     if (!historyData || !historyData.length) return [];
     
@@ -198,6 +207,76 @@ const GrowthCharts = ({ historyData, activeTab, birthDate }) => {
     });
     
   }, [historyData, birthDate]);
+
+  const handleDoubleClick = (data) => {
+    if (!data || !data.payload) return;
+    
+    const dataPoint = data.payload;
+    
+    // Open the delete modal
+    setDeleteModal({
+      isOpen: true,
+      dataPoint: dataPoint
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteModal.dataPoint) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      const dataPoint = deleteModal.dataPoint;
+      
+      // Try to determine the original date format
+      let dateForDeletion = dataPoint.date;
+      
+      // If we have a fixedDate, the original date might be different
+      if (dataPoint.fixedDate && dataPoint.recordDate === "Invalid DateTime") {
+        // This means the date was processed, we need to find the original format
+        dateForDeletion = dataPoint.date; // Keep using the original date field
+      }
+      
+      const token = localStorage.getItem("token");
+      
+      const response = await fetch('/api/delete-patient-history', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          patientId: patientId,
+          date: dateForDeletion
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to delete checkpoint');
+      }
+      
+      // Call the parent callback to update the data
+      if (onDeleteCheckpoint) {
+        onDeleteCheckpoint(dateForDeletion);
+      }
+      
+      // Close the modal
+      setDeleteModal({ isOpen: false, dataPoint: null });
+      navigate(`/treatment/${patientId}`);
+      
+    } catch (error) {
+      console.error('Error deleting checkpoint:', error);
+      alert('Error deleting checkpoint: ' + error.message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModal({ isOpen: false, dataPoint: null });
+  };
 
   // Handle custom range input changes
   const handleRangeChange = (e, field) => {
@@ -232,50 +311,63 @@ const GrowthCharts = ({ historyData, activeTab, birthDate }) => {
   };
   
   return (
-    <div className={`grid ${activeTab === "all" ? "grid-cols-1" : "grid-cols-1"} gap-6`}>
-      {(activeTab === "all" || activeTab === "weight") && (
-        <ChartBlock
-          title="Weight Chart"
-          description="Track and monitor weight progress over time"
-          dataKeyActual="weight"
-          strokeColor={CHART_COLORS.weight.line}
-          dotColor={CHART_COLORS.weight.dot}
-          hoverColor={CHART_COLORS.weight.hover}
-          historyData={processedHistoryData}
-          yLabel="Weight (kg)"
-          gender="boys"
-          type="weight"
-          zoomLevel={zoomLevel}
-          setZoomLevel={setZoomLevel}
-          customRange={customRange}
-          handleRangeChange={handleRangeChange}
-          applyCustomRange={applyCustomRange}
-          isCustomRange={isCustomRange}
-          setIsCustomRange={setIsCustomRange}
-        />
-      )}
-      {(activeTab === "all" || activeTab === "height") && (
-        <ChartBlock
-          title="Height Chart"
-          description="Monitor height growth relative to standard percentiles"
-          dataKeyActual="height"
-          strokeColor={CHART_COLORS.height.line}
-          dotColor={CHART_COLORS.height.dot}
-          hoverColor={CHART_COLORS.height.hover}
-          historyData={processedHistoryData}
-          yLabel="Height (cm)"
-          gender="boys"
-          type="height"
-          zoomLevel={zoomLevel}
-          setZoomLevel={setZoomLevel}
-          customRange={customRange}
-          handleRangeChange={handleRangeChange}
-          applyCustomRange={applyCustomRange}
-          isCustomRange={isCustomRange}
-          setIsCustomRange={setIsCustomRange}
-        />
-      )}
-    </div>
+    <>
+      <div className={`grid ${activeTab === "all" ? "grid-cols-1" : "grid-cols-1"} gap-6`}>
+        {(activeTab === "all" || activeTab === "weight") && (
+          <ChartBlock
+            title="Weight Chart"
+            description="Track and monitor weight progress over time"
+            dataKeyActual="weight"
+            strokeColor={CHART_COLORS.weight.line}
+            dotColor={CHART_COLORS.weight.dot}
+            hoverColor={CHART_COLORS.weight.hover}
+            historyData={processedHistoryData}
+            yLabel="Weight (kg)"
+            gender="boys"
+            type="weight"
+            zoomLevel={zoomLevel}
+            setZoomLevel={setZoomLevel}
+            customRange={customRange}
+            handleRangeChange={handleRangeChange}
+            applyCustomRange={applyCustomRange}
+            isCustomRange={isCustomRange}
+            setIsCustomRange={setIsCustomRange}
+            onDoubleClick={handleDoubleClick}
+          />
+        )}
+        {(activeTab === "all" || activeTab === "height") && (
+          <ChartBlock
+            title="Height Chart"
+            description="Monitor height growth relative to standard percentiles"
+            dataKeyActual="height"
+            strokeColor={CHART_COLORS.height.line}
+            dotColor={CHART_COLORS.height.dot}
+            hoverColor={CHART_COLORS.height.hover}
+            historyData={processedHistoryData}
+            yLabel="Height (cm)"
+            gender="boys"
+            type="height"
+            zoomLevel={zoomLevel}
+            setZoomLevel={setZoomLevel}
+            customRange={customRange}
+            handleRangeChange={handleRangeChange}
+            applyCustomRange={applyCustomRange}
+            isCustomRange={isCustomRange}
+            setIsCustomRange={setIsCustomRange}
+            onDoubleClick={handleDoubleClick}
+          />
+        )}
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        dataPoint={deleteModal.dataPoint}
+        isLoading={isDeleting}
+      />
+    </>
   );
 };
 
@@ -283,7 +375,7 @@ const ChartBlock = ({
   title, description, dataKeyActual, dataKeyTarget,
   strokeColor, dotColor, hoverColor, historyData, yLabel, 
   gender, type, zoomLevel, setZoomLevel, customRange, handleRangeChange,
-  applyCustomRange, isCustomRange, setIsCustomRange
+  applyCustomRange, isCustomRange, setIsCustomRange, onDoubleClick
 }) => {
   const percentileData = getPercentileLinesData(gender, type);
   
@@ -512,7 +604,7 @@ const ChartBlock = ({
               );
             })}
 
-            {/* Patient data line with improved styling */}
+            {/* Patient data line with improved styling and double click handler */}
             <Line
               type="monotone"
               data={filteredHistoryData}
@@ -524,13 +616,16 @@ const ChartBlock = ({
                 r: 6, 
                 strokeWidth: 2,
                 fill: hoverColor || dotColor || strokeColor, 
-                stroke: 'white' 
+                stroke: 'white',
+                onDoubleClick: onDoubleClick
               }}
               dot={{ 
                 r: 5, 
                 strokeWidth: 2, 
                 fill: dotColor || strokeColor, 
-                stroke: 'white' 
+                stroke: 'white',
+                onDoubleClick: onDoubleClick,
+                style: { cursor: 'pointer' }
               }}
               isAnimationActive={false}
               connectNulls={true}
@@ -538,12 +633,6 @@ const ChartBlock = ({
           </LineChart>
         </ResponsiveContainer>
         
-        {/* Show empty state message if no data points in current range */}
-        {filteredHistoryData.length === 0 && (
-          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
-            <p><strong>No data points in the current age range.</strong> Try adjusting the age range or checking if there are data entries with age values in this range.</p>
-          </div>
-        )}
       </div>
       
       {/* Controls section */}

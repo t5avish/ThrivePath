@@ -62,6 +62,15 @@ const TrackingPage = () => {
     }
   }, [patient, patientId, navigate]);
 
+  // Handle checkpoint deletion
+  const handleDeleteCheckpoint = (dateToDelete) => {
+    // Remove the deleted entry from the local state
+    setHistoryData(prev => prev.filter(entry => entry.date !== dateToDelete));
+    
+    // Optionally navigate back to treatment page to refresh data
+    // navigate(`/treatment/${patientId}`);
+  };
+
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -148,6 +157,8 @@ const TrackingPage = () => {
           historyData={historyData}
           activeTab={activeTab}
           birthDate={patient?.birthdate} // Pass as string, not DateTime object
+          patientId={patientId} // Pass patientId for deletion API
+          onDeleteCheckpoint={handleDeleteCheckpoint} // Pass deletion callback
         />
       </main>
 
