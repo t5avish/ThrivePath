@@ -51,11 +51,9 @@ const CustomAxisTick = ({ x, y, payload, isXAxis = true }) => {
   );
 };
 
-// Helper function to determine percentile range with improved phrasing
 const getPercentileRange = (value, age, percentileData, type) => {
   if (!value || !percentileData) return "Not available";
   
-  // Find closest age data point in percentile data
   const closestAgeData = percentileData.reduce((prev, curr) => {
     return Math.abs(curr.ageYears - age) < Math.abs(prev.ageYears - age) ? curr : prev;
   });
@@ -70,7 +68,6 @@ const getPercentileRange = (value, age, percentileData, type) => {
 
 const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) => {
   if (active && payload && payload.length) {
-    // Find the actual data line among all the lines
     const actualDataPoint = payload.find(p => 
       p.dataKey === "weight" || 
       p.dataKey === "height"
@@ -78,7 +75,6 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
     
     if (!actualDataPoint) return null;
     
-    // Get percentile range for this measurement
     const percentileRange = getPercentileRange(
       actualDataPoint.value,
       label,
@@ -86,7 +82,6 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
       type
     );
     
-    // Get the data point object
     const dataPoint = actualDataPoint.payload;
     
     let showDateDisplay = false;
@@ -117,7 +112,6 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
       showDateDisplay = false;
     }
     
-    // Format the age value cleanly
     const formattedAge = parseFloat(label).toFixed(2);
     
     return (
@@ -192,7 +186,6 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
 
-  // Detect mobile screen size
   React.useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -226,7 +219,6 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     
     const dataPoint = data.payload;
     
-    // Open the delete modal
     setDeleteModal({
       isOpen: true,
       dataPoint: dataPoint
@@ -241,13 +233,10 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     try {
       const dataPoint = deleteModal.dataPoint;
       
-      // Try to determine the original date format
       let dateForDeletion = dataPoint.date;
       
-      // If we have a fixedDate, the original date might be different
       if (dataPoint.fixedDate && dataPoint.recordDate === "Invalid DateTime") {
-        // This means the date was processed, we need to find the original format
-        dateForDeletion = dataPoint.date; // Keep using the original date field
+        dateForDeletion = dataPoint.date;
       }
       
       const token = localStorage.getItem("token");
@@ -270,12 +259,10 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
         throw new Error(result.message || 'Failed to delete checkpoint');
       }
       
-      // Call the parent callback to update the data
       if (onDeleteCheckpoint) {
         onDeleteCheckpoint(dateForDeletion);
       }
       
-      // Close the modal
       setDeleteModal({ isOpen: false, dataPoint: null });
       navigate(`/treatment/${patientId}`);
       
@@ -291,7 +278,6 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     setDeleteModal({ isOpen: false, dataPoint: null });
   };
 
-  // Handle custom range input changes
   const handleRangeChange = (e, field) => {
     setCustomRange({
       ...customRange,
@@ -299,13 +285,11 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     });
   };
 
-  // Apply custom range
   const applyCustomRange = () => {
     const min = parseFloat(customRange.min);
     const max = parseFloat(customRange.max);
     
     if (!isNaN(min) && !isNaN(max) && min < max) {
-      // Validate the range
       if (min < 0) {
         alert("Minimum age cannot be less than 0");
         return;
@@ -543,17 +527,13 @@ const ChartBlock = ({
               />
             )}
 
-            {/* Draw percentile lines with improved styling - all solid lines now */}
             {percentiles.map((p) => {
-              // Get percentile data for the full range
               const allPercentileData = [...percentileData];
               
-              // Generate smooth data across the entire visible range
-              const step = 0.25; // 3-month intervals for smoother curves
+              const step = 0.25;
               const enhancedData = [];
               
               for (let age = minAge; age <= maxAge; age += step) {
-                // Find the closest existing data points for interpolation
                 const lowerPoint = allPercentileData
                   .filter(d => d.ageYears <= age)
                   .sort((a, b) => b.ageYears - a.ageYears)[0];
@@ -562,16 +542,13 @@ const ChartBlock = ({
                   .filter(d => d.ageYears >= age)
                   .sort((a, b) => a.ageYears - b.ageYears)[0];
                 
-                // If we have both points for interpolation
                 if (lowerPoint && upperPoint) {
-                  // If we have an exact match, use it
                   if (Math.abs(lowerPoint.ageYears - age) < 0.01) {
                     enhancedData.push({
                       ageYears: age,
                       [p]: lowerPoint[p]
                     });
                   } 
-                  // Otherwise interpolate between the closest points
                   else {
                     const ageRange = upperPoint.ageYears - lowerPoint.ageYears;
                     if (ageRange > 0) {
@@ -585,7 +562,7 @@ const ChartBlock = ({
                     }
                   }
                 }
-                // If we only have data on one side, use the closest available point
+
                 else if (lowerPoint) {
                   enhancedData.push({
                     ageYears: age,
@@ -600,7 +577,6 @@ const ChartBlock = ({
                 }
               }
               
-              // Apply different styles based on percentile importance
               const isMainPercentile = p === "P50";
               
               return (
@@ -620,7 +596,6 @@ const ChartBlock = ({
               );
             })}
 
-            {/* Patient data line with improved styling and double click handler */}
             <Line
               type="monotone"
               data={filteredHistoryData}
@@ -653,7 +628,6 @@ const ChartBlock = ({
       
       {/* Controls section */}
       <div className="p-3 sm:p-6 border-t border-gray-200">
-        {/* Percentile guide and explanation */}
         <div className="mb-4">
           <h3 className="text-sm font-medium text-gray-700 mb-2">Percentile Guide</h3>
           <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -672,7 +646,6 @@ const ChartBlock = ({
           </p>
         </div>
         
-        {/* Custom range input with improved design */}
         <div className="p-3 bg-gray-50 rounded-lg mb-4">
           <p className="text-sm font-medium text-gray-700 mb-2">
             Current view: Ages {minAge} to {maxAge} years
@@ -713,7 +686,6 @@ const ChartBlock = ({
           </div>
         </div>
         
-        {/* View toggle buttons with updated design (no red) */}
         <div className="flex flex-col sm:flex-row gap-2">
           <button 
             className={`px-3 sm:px-4 py-2 rounded-md text-sm transition-colors ${

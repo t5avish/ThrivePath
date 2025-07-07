@@ -16,23 +16,19 @@ const AddPatient2 = () => {
       navigate("/signin");
     }
     
-    // Generate growth history entries if birthdate is available
     if (location.state?.birthdate) {
       generateGrowthEntries(location.state.birthdate);
     }
   }, [navigate, location.state]);
   
-  // Generate half-year interval entries from birthdate to current date
   const generateGrowthEntries = (birthdate) => {
     const birthDate = new Date(birthdate);
     const today = new Date();
     const entries = [];
     
-    // Start with birthdate (age 0)
     let currentDate = new Date(birthDate);
     let ageInYears = 0;
     
-    // Add entry for birthdate with initial height/weight as blank (will be filled in by user)
     entries.push({
       date: currentDate.toISOString().split('T')[0],
       ageLabel: "Age 0",
@@ -41,15 +37,11 @@ const AddPatient2 = () => {
       weight: "",
     });
     
-    // Generate entries for every half year
     while (true) {
-      // Add 6 months
       currentDate.setMonth(currentDate.getMonth() + 6);
       
-      // Break if we've passed today's date
       if (currentDate > today) break;
       
-      // Calculate age in years with one decimal place
       ageInYears += 0.5;
       
       entries.push({
@@ -61,7 +53,6 @@ const AddPatient2 = () => {
       });
     }
     
-    // Add current measurements (today) from AddPatient1
     const ageInYearsCurrent = calculateAgeInYears(birthDate, today);
     entries.push({
       date: today.toISOString().split('T')[0],
@@ -74,7 +65,6 @@ const AddPatient2 = () => {
     setGrowthHistory(entries);
   };
   
-  // Calculate age in decimal years
   const calculateAgeInYears = (birthDate, currentDate) => {
     const ageInMilliseconds = currentDate - birthDate;
     const millisecondsPerYear = 1000 * 60 * 60 * 24 * 365.25;
@@ -92,9 +82,7 @@ const AddPatient2 = () => {
     let isValid = true;
     
     growthHistory.forEach((entry, index) => {
-      // Only validate entries that have at least one value filled in
       if (entry.height || entry.weight) {
-        // Validate height if provided
         if (entry.height) {
           const height = parseFloat(entry.height);
           if (isNaN(height) || height < 30 || height > 200) {
@@ -103,7 +91,6 @@ const AddPatient2 = () => {
           }
         }
         
-        // Validate weight if provided
         if (entry.weight) {
           const weight = parseFloat(entry.weight);
           if (isNaN(weight) || weight < 2 || weight > 150) {
@@ -121,7 +108,6 @@ const AddPatient2 = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     
-    // Validate entries
     if (!validateForm()) {
       return;
     }
@@ -142,9 +128,8 @@ const AddPatient2 = () => {
         weight: location.state.weight,
       });
 
-      // Format history entries from growth history
       const historyEntries = growthHistory
-        .filter(entry => entry.height || entry.weight) // Only include entries with at least one measurement
+        .filter(entry => entry.height || entry.weight)
         .map(entry => ({
           date: entry.date,
           height: entry.height ? Number(entry.height) : undefined,

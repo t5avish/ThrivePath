@@ -189,12 +189,6 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
 
       const updateData = await updateResponse.json();
 
-      if (updateResponse.ok) {
-        console.log("Treatment updated successfully:", updateData.message);
-      } else {
-        console.log("Error updating treatment:", updateData.message);
-      }
-
     } catch (error) {
       console.log("Error during API call:", error);
     } finally {

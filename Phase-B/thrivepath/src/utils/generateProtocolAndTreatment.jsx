@@ -1,5 +1,3 @@
-// utils/generateProtocolAndTreatment.js
-
 import ProtocolGenerator from "./ProtocolGenerator";
 import ResponseParser from "./ResponseParser";
 

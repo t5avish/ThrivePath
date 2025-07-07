@@ -26,8 +26,6 @@ export default async function handler(req, res) {
     const db = await connectToDatabase();
     const { patientId, date } = req.body;
 
-    console.log('Delete request received:', { patientId, date });
-
     if (!patientId || !date) {
       return res.status(400).json({ message: 'Missing patientId or date' });
     }
@@ -41,23 +39,14 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: 'Patient not found or unauthorized' });
     }
 
-    // Debug: Log the patient's history to see the date formats
-    console.log('Patient history entries:', patient.history?.map(entry => ({
-      date: entry.date,
-      weight: entry.weight,
-      height: entry.height
-    })));
-
     // Try to find the exact entry first
     const entryToDelete = patient.history?.find(entry => entry.date === date);
-    console.log('Found entry to delete:', entryToDelete);
 
     if (!entryToDelete) {
       // If exact match not found, try to find similar dates
       const similarEntries = patient.history?.filter(entry => 
         entry.date.includes(date) || date.includes(entry.date)
       );
-      console.log('Similar entries found:', similarEntries);
       
       return res.status(400).json({ 
         message: 'Entry not found. Date format might not match.',
@@ -74,8 +63,6 @@ export default async function handler(req, res) {
         },
       }
     );
-
-    console.log('Update result:', updateResult);
 
     if (updateResult.modifiedCount > 0) {
       return res.status(200).json({ message: 'Entry deleted successfully' });

@@ -55,7 +55,6 @@ const TreatmentPage = () => {
   const handleDownloadPlan = () => {
     const element = dashboardRef.current;
   
-    // הסתר זמנית את הכפתור
     const updateBtn = document.getElementById("update-meal-btn");
     const originalDisplay = updateBtn?.style.display;
     if (updateBtn) updateBtn.style.display = "none";
@@ -84,7 +83,6 @@ const TreatmentPage = () => {
         pdf.addImage(imgData, "JPEG", 0, 0, imgProps.width, imgProps.height);
         pdf.save(`${patient?.name || "treatment"}-plan.pdf`);
       } finally {
-        // החזרת הכפתור לאחר יצירת ה־PDF
         if (updateBtn) updateBtn.style.display = originalDisplay || "flex";
       }
     }, 100);

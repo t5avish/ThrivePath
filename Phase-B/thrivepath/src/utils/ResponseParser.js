@@ -1,5 +1,4 @@
 function parseAIResponse(markdownString) {
-  // Initialize the result object
   const result = {
     dailyMealPlan: {
       breakfast: [],
@@ -27,14 +26,11 @@ function parseAIResponse(markdownString) {
     }
   };
 
-  // Split the markdown into sections
   const sections = markdownString.split(/###\s+\d+\.\s+/);
 
-  // Process each section
   sections.forEach(section => {
     if (!section.trim()) return;
 
-    // Determine which section we're in
     if (section.includes("Daily Meal Plan")) {
       parseMealPlan(section, result);
     } else if (section.includes("Daily Hydration")) {

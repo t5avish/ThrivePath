@@ -28,19 +28,16 @@ const AddPatient1 = () => {
   const validate = () => {
     const errs = {};
 
-    // Full Name
     if (!formData.name.trim()) {
       errs.name = "Full name is required.";
     } else if (!/^[A-Za-z\s\-]{2,70}$/.test(formData.name)) {
       errs.name = "Only letters, spaces, and hyphens allowed (2-70 chars).";
     }
 
-    // Gender
     if (!formData.gender) {
       errs.gender = "Gender is required.";
     }
 
-    // Birthdate
     const birthDate = new Date(formData.birthdate);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
@@ -57,7 +54,6 @@ const AddPatient1 = () => {
       errs.birthdate = "Child must be 12 years old or younger.";
     }
 
-    // Height
     const height = parseFloat(formData.height);
     if (!formData.height) {
       errs.height = "Height is required.";
@@ -65,7 +61,6 @@ const AddPatient1 = () => {
       errs.height = "Enter valid height (30–200 cm).";
     }
 
-    // Weight
     const weight = parseFloat(formData.weight);
     if (!formData.weight) {
       errs.weight = "Weight is required.";

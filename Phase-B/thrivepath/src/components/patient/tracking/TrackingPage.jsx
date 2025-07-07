@@ -44,7 +44,7 @@ const TrackingPage = () => {
         return {
           ageYears: parseFloat(ageInYears.toFixed(2)),
           recordDate: dateObj.toFormat("dd/MM/yyyy HH:mm:ss"),
-          date: entry.date, // Keep original date for reference
+          date: entry.date,
           weight: entry.weight,
           height: entry.height,
           targetWeight: medianWeights[gender]?.[roundedAgeYear] || null,
@@ -52,23 +52,13 @@ const TrackingPage = () => {
         };
       });
       
-      // Sort data by age to ensure proper chart rendering
       formattedData.sort((a, b) => a.ageYears - b.ageYears);
-      
-      // Log the data to check if ageYears is calculated correctly
-      console.log("Formatted History Data:", formattedData);
       
       setHistoryData(formattedData);
     }
   }, [patient, patientId, navigate]);
-
-  // Handle checkpoint deletion
   const handleDeleteCheckpoint = (dateToDelete) => {
-    // Remove the deleted entry from the local state
     setHistoryData(prev => prev.filter(entry => entry.date !== dateToDelete));
-    
-    // Optionally navigate back to treatment page to refresh data
-    // navigate(`/treatment/${patientId}`);
   };
 
   const handleSubmitForm = async (e) => {
@@ -109,7 +99,7 @@ const TrackingPage = () => {
       const newEntry = {
         ageYears: parseFloat(ageInYears.toFixed(2)),
         recordDate: dateObj.toFormat("dd/MM/yyyy HH:mm:ss"),
-        date: newDate, // Add date for consistency
+        date: newDate,
         weight,
         height,
         targetWeight: medianWeights[gender]?.[roundedAgeYear] || null,
@@ -156,9 +146,9 @@ const TrackingPage = () => {
         <GrowthCharts
           historyData={historyData}
           activeTab={activeTab}
-          birthDate={patient?.birthdate} // Pass as string, not DateTime object
-          patientId={patientId} // Pass patientId for deletion API
-          onDeleteCheckpoint={handleDeleteCheckpoint} // Pass deletion callback
+          birthDate={patient?.birthdate}
+          patientId={patientId}
+          onDeleteCheckpoint={handleDeleteCheckpoint}
         />
       </main>
 
