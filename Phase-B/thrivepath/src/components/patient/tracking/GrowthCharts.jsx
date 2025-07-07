@@ -30,7 +30,7 @@ const CHART_COLORS = {
 };
 
 const CustomAxisTick = ({ x, y, payload, isXAxis = true }) => {
-  const offset = isXAxis ? 16 : -10;
+  const offset = isXAxis ? 12 : -8;
   const anchor = isXAxis ? "middle" : "end";
   const xPos = isXAxis ? 0 : offset;
   const yPos = isXAxis ? offset : 0;
@@ -42,7 +42,7 @@ const CustomAxisTick = ({ x, y, payload, isXAxis = true }) => {
         y={yPos} 
         textAnchor={anchor} 
         fill="#64748b" 
-        fontSize={12}
+        fontSize={10}
         fontFamily="Inter, system-ui, sans-serif"
       >
         {isXAxis ? parseFloat(payload.value).toFixed(1) : Math.round(payload.value)}
@@ -121,31 +121,31 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
     const formattedAge = parseFloat(label).toFixed(2);
     
     return (
-      <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-xl">
-      <div className="mb-3">
-        <p className="font-bold text-gray-800 text-lg">
-          Age: <span className="ml-1">{formattedAge} years</span>
-        </p>
-        {showDateDisplay && (
-          <p className="text-sm text-gray-500 mt-1">
-            Measured on <span className="font-medium">{dateDisplay}</span>
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-xl max-w-xs">
+        <div className="mb-2">
+          <p className="font-bold text-gray-800 text-sm sm:text-base">
+            Age: <span className="ml-1">{formattedAge} years</span>
           </p>
-        )}
-      </div>
+          {showDateDisplay && (
+            <p className="text-xs text-gray-500 mt-1">
+              Measured on <span className="font-medium">{dateDisplay}</span>
+            </p>
+          )}
+        </div>
         
-        <div className="flex items-center mb-3">
+        <div className="flex items-center mb-2">
           <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: actualDataPoint.color }}></div>
-          <p className="text-gray-800 font-medium">
+          <p className="text-gray-800 font-medium text-sm">
             {actualDataPoint.value.toFixed(1)} {unit}
           </p>
         </div>
         
         <div className="pt-2 border-t border-gray-200">
           <div className="flex items-center">
-            <div className="w-2 h-8 bg-blue-500 mr-3 rounded-sm opacity-80"></div>
+            <div className="w-2 h-6 bg-blue-500 mr-2 rounded-sm opacity-80"></div>
             <div>
-              <p className="text-sm font-medium text-gray-700">Percentile Range:</p>
-              <p className="text-sm font-medium">
+              <p className="text-xs font-medium text-gray-700">Percentile Range:</p>
+              <p className="text-xs font-medium">
                 {percentileRange}
               </p>
             </div>
@@ -190,6 +190,19 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
   const [isCustomRange, setIsCustomRange] = React.useState(false);
   const [deleteModal, setDeleteModal] = React.useState({ isOpen: false, dataPoint: null });
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  // Detect mobile screen size
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const processedHistoryData = React.useMemo(() => {
     
@@ -312,7 +325,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
   
   return (
     <>
-      <div className={`grid ${activeTab === "all" ? "grid-cols-1" : "grid-cols-1"} gap-6`}>
+      <div className={`grid ${activeTab === "all" ? "grid-cols-1" : "grid-cols-1"} gap-4 sm:gap-6`}>
         {(activeTab === "all" || activeTab === "weight") && (
           <ChartBlock
             title="Weight Chart"
@@ -333,6 +346,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
             isCustomRange={isCustomRange}
             setIsCustomRange={setIsCustomRange}
             onDoubleClick={handleDoubleClick}
+            isMobile={isMobile}
           />
         )}
         {(activeTab === "all" || activeTab === "height") && (
@@ -355,6 +369,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
             isCustomRange={isCustomRange}
             setIsCustomRange={setIsCustomRange}
             onDoubleClick={handleDoubleClick}
+            isMobile={isMobile}
           />
         )}
       </div>
@@ -375,7 +390,7 @@ const ChartBlock = ({
   title, description, dataKeyActual, dataKeyTarget,
   strokeColor, dotColor, hoverColor, historyData, yLabel, 
   gender, type, zoomLevel, setZoomLevel, customRange, handleRangeChange,
-  applyCustomRange, isCustomRange, setIsCustomRange, onDoubleClick
+  applyCustomRange, isCustomRange, setIsCustomRange, onDoubleClick, isMobile
 }) => {
   const percentileData = getPercentileLinesData(gender, type);
   
@@ -430,43 +445,42 @@ const ChartBlock = ({
   const minValue = Math.floor(dataMin - (valueRange * 0.1));
   const maxValue = Math.ceil(dataMax + (valueRange * 0.1));
   
+  // Mobile-specific adjustments
+  const chartHeight = isMobile ? 350 : 500;
+  const chartMargin = isMobile 
+    ? { top: 20, right: 15, left: 5, bottom: 40 }
+    : { top: 30, right: 30, left: 10, bottom: 60 };
+  
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow mb-8 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow mb-4 sm:mb-8 overflow-hidden">
       {/* Chart header with gradient background */}
-      <div className={`p-6 bg-gradient-to-r from-slate-50 to-slate-100`}>
-        <h2 className="text-2xl font-semibold mb-2 text-gray-800">{title}</h2>
-        <p className="text-sm text-gray-600">{description}</p>
+      <div className={`p-3 sm:p-6 bg-gradient-to-r from-slate-50 to-slate-100`}>
+        <h2 className="text-lg sm:text-2xl font-semibold mb-1 sm:mb-2 text-gray-800">{title}</h2>
+        <p className="text-xs sm:text-sm text-gray-600">{description}</p>
         
         {/* Data point indicator */}
         <div className="mt-2 flex items-center">
           <span className="inline-block h-2 w-2 rounded-full mr-2 bg-black"></span>
-          <span className="text-sm text-gray-600">
+          <span className="text-xs sm:text-sm text-gray-600">
             {filteredHistoryData.length} data point{filteredHistoryData.length !== 1 ? 's' : ''} in range
           </span>
         </div>
       </div>
       
       {/* Make the chart container have a light background */}
-      <div className="bg-gray-50 p-6">
+      <div className="bg-gray-50 p-2 sm:p-6">
         {/* Chart container */}
-        <ResponsiveContainer width="100%" height={500}>
-          <LineChart 
-            margin={{ 
-              top: 30, 
-              right: 30, 
-              left: 10, 
-              bottom: 60 
-            }}
-          >
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <LineChart margin={chartMargin}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis
               dataKey="ageYears"
               type="number"
               domain={[minAge, maxAge]}
-              tickCount={Math.min(10, maxAge - minAge + 1)}
+              tickCount={isMobile ? 6 : Math.min(10, maxAge - minAge + 1)}
               tick={(props) => <CustomAxisTick {...props} isXAxis={true} />}
-              height={60}
-              label={{
+              height={isMobile ? 40 : 60}
+              label={!isMobile ? {
                 value: "Age (years)",
                 position: "insideBottom",
                 offset: -10,
@@ -476,10 +490,10 @@ const ChartBlock = ({
                   fontSize: 13,
                   fontWeight: 500
                 }
-              }}
+              } : undefined}
             />
             <YAxis
-              label={{
+              label={!isMobile ? {
                 value: yLabel,
                 angle: -90,
                 position: 'insideLeft',
@@ -490,10 +504,10 @@ const ChartBlock = ({
                   fontSize: 13,
                   fontWeight: 500 
                 }
-              }}
+              } : undefined}
               domain={[minValue, maxValue]}
               tick={(props) => <CustomAxisTick {...props} isXAxis={false} />}
-              width={60}
+              width={isMobile ? 40 : 60}
             />
             <Tooltip 
               content={<CustomTooltip 
@@ -503,29 +517,31 @@ const ChartBlock = ({
               />}
               isAnimationActive={false}
             />
-            <Legend 
-              verticalAlign="top" 
-              height={40}
-              wrapperStyle={{ 
-                fontSize: '13px', 
-                fontWeight: 500,
-                paddingTop: '5px'
-              }}
-              formatter={(value) => {
-                // Better formatting for legend labels
-                if (value.startsWith('P')) {
-                  return `${value} percentile`;
-                }
-                // Update patient data line label
-                if (value === "Patient Weight (kg)") {
-                  return "Patient Weight";
-                }
-                if (value === "Patient Height (cm)") {
-                  return "Patient Height";
-                }
-                return value;
-              }}
-            />
+            {!isMobile && (
+              <Legend 
+                verticalAlign="top" 
+                height={40}
+                wrapperStyle={{ 
+                  fontSize: '12px', 
+                  fontWeight: 500,
+                  paddingTop: '5px'
+                }}
+                formatter={(value) => {
+                  // Better formatting for legend labels
+                  if (value.startsWith('P')) {
+                    return `${value} percentile`;
+                  }
+                  // Update patient data line label
+                  if (value === "Patient Weight (kg)") {
+                    return "Patient Weight";
+                  }
+                  if (value === "Patient Height (cm)") {
+                    return "Patient Height";
+                  }
+                  return value;
+                }}
+              />
+            )}
 
             {/* Draw percentile lines with improved styling - all solid lines now */}
             {percentiles.map((p) => {
@@ -595,7 +611,7 @@ const ChartBlock = ({
                   dataKey={p}
                   name={p}
                   stroke={CHART_COLORS.percentiles[p]}
-                  strokeWidth={isMainPercentile ? 2 : 1.5}
+                  strokeWidth={isMainPercentile ? 2 : (isMobile ? 1 : 1.5)}
                   strokeOpacity={isMainPercentile ? 1 : 0.8}
                   dot={false}
                   activeDot={false}
@@ -611,16 +627,16 @@ const ChartBlock = ({
               dataKey={dataKeyActual}
               name={`Patient ${yLabel.split(' ')[0]}`}
               stroke={strokeColor}
-              strokeWidth={3}
+              strokeWidth={isMobile ? 2 : 3}
               activeDot={{ 
-                r: 6, 
+                r: isMobile ? 4 : 6, 
                 strokeWidth: 2,
                 fill: hoverColor || dotColor || strokeColor, 
                 stroke: 'white',
                 onDoubleClick: onDoubleClick
               }}
               dot={{ 
-                r: 5, 
+                r: isMobile ? 3 : 5, 
                 strokeWidth: 2, 
                 fill: dotColor || strokeColor, 
                 stroke: 'white',
@@ -636,11 +652,11 @@ const ChartBlock = ({
       </div>
       
       {/* Controls section */}
-      <div className="p-6 border-t border-gray-200">
+      <div className="p-3 sm:p-6 border-t border-gray-200">
         {/* Percentile guide and explanation */}
         <div className="mb-4">
           <h3 className="text-sm font-medium text-gray-700 mb-2">Percentile Guide</h3>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {percentiles.map(p => (
               <div key={p} className="flex items-center">
                 <div 
@@ -662,9 +678,9 @@ const ChartBlock = ({
             Current view: Ages {minAge} to {maxAge} years
           </p>
           
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
             <span className="text-sm font-medium text-gray-600">Custom range:</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <input
                 type="number"
                 min="0"
@@ -698,9 +714,9 @@ const ChartBlock = ({
         </div>
         
         {/* View toggle buttons with updated design (no red) */}
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <button 
-            className={`px-4 py-2 rounded-md text-sm transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-md text-sm transition-colors ${
               zoomLevel === "auto" 
                 ? 'bg-blue-100 text-blue-800'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -713,7 +729,7 @@ const ChartBlock = ({
             Auto Zoom
           </button>
           <button 
-            className={`px-4 py-2 rounded-md text-sm transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-md text-sm transition-colors ${
               zoomLevel === "full" 
                 ? 'bg-blue-100 text-blue-800'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -727,7 +743,7 @@ const ChartBlock = ({
           </button>
           {isCustomRange && (
             <button 
-              className="px-4 py-2 rounded-md text-sm transition-colors bg-blue-100 text-blue-800"
+              className="px-3 sm:px-4 py-2 rounded-md text-sm transition-colors bg-blue-100 text-blue-800"
               onClick={() => {}}
             >
               Custom: {customRange.min} - {customRange.max} yrs

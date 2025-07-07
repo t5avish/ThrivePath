@@ -241,7 +241,7 @@ const TreatmentPage = () => {
       {/* Footer */}
       <footer className="mt-8 py-4 bg-white border-t border-gray-200">
         <div className="container mx-auto px-4 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} ThrivePath - Patient Treatment System
+          © {new Date().getFullYear()} ThrivePath
         </div>
       </footer>
     </div>
