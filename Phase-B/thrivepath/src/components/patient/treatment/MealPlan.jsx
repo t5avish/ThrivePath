@@ -6,6 +6,8 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   const [loading, setLoading] = useState(false);
   const [isMealsVisible, setIsMealsVisible] = useState(true); 
   const [currentMealPlan, setCurrentMealPlan] = useState(dailyMealPlan);
+  const [showSpecialRequest, setShowSpecialRequest] = useState(false);
+  const [specialRequest, setSpecialRequest] = useState("");
   
   useEffect(() => {
     setPatientData(patient);
@@ -72,6 +74,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   };
 
   const handleRefresh = async () => {
+    setShowSpecialRequest(false);
     setLoading(true);
     setIsMealsVisible(false);
 
@@ -139,6 +142,13 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   
     Protocol:
     ${Object.entries(patientData.protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
+    
+    Special Patient Request
+    If the following request is reasonable and relevant to nutrition or preferences, take it into account. If it's unrelated or doesn't make sense (e.g., asking to include a house), ignore it completely.
+
+    Patient says:
+    "${specialRequest || "No special request provided."}"
+    
     `;
 
     try {
@@ -186,7 +196,6 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
           updatedTreatment: updatedTreatment,
         }),
       });
-
       const updateData = await updateResponse.json();
 
     } catch (error) {
@@ -194,6 +203,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
     } finally {
       setLoading(false);
       setIsMealsVisible(true);
+      setSpecialRequest("");
     }
   };
 
@@ -219,29 +229,71 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </h2>
-        <button
-          id="update-meal-btn"
-          onClick={handleRefresh}
-          className="update-button print:hidden flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-5 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg transition-colors"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>Updating...</span>
-            </>
-          ) : (
-            <>
-              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+          <button
+            id="update-meal-btn"
+            onClick={() => setShowSpecialRequest(true)}
+            className="update-button print:hidden flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-5 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg transition-colors"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                <span>Updating...</span>
+              </>
+            ) : (
               <span>Update Meal Plan</span>
-            </>
-          )}
-        </button>
+            )}
+          </button>
+          {showSpecialRequest && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm px-4">
+            <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 relative">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                📝 Special Request for New Meal Plan
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Add notes about any changes you'd like in the next plan. (e.g., <span className="italic">'No eggs'</span>, <span className="italic">'Change only breakfast'</span>, <span className="italic">'Make it vegan'</span>)
+              </p>
+
+              <textarea
+                value={specialRequest}
+                onChange={(e) => setSpecialRequest(e.target.value)}
+                placeholder="e.g., I want more fruit options and no dairy."
+                rows={4}
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+              />
+
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowSpecialRequest(false)}
+                  className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRefresh}
+                  className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm"
+                >
+                  Submit Request
+                </button>
+              </div>
+
+              {/* Close Icon */}
+              <button
+                onClick={() => setShowSpecialRequest(false)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+                aria-label="Close request form"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* Hide meals temporarily while loading */}
