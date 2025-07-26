@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import parseAIResponse from "../../../utils/ResponseParser"
+import { useState, useEffect } from "react";
+import { dailyMealPlanPromptJSON } from "../../../utils/generateProtocolAndTreatment"
 
 const MealPlan = ({ dailyMealPlan, patient }) => {
   const [patientData, setPatientData] = useState(null);
@@ -87,62 +87,28 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
     }
 
     const prompt = `
-    Based on the following protocol and current treatment plan, generate a personalized daily meal plan divided into 4 sections. 
-    Make sure that the new meal plan is different from the existing one provided below. Use **Markdown formatting** and the same style and structure shown.
-    Make sure the output strictly follows the structure shown below and does not deviate in any way.
-  
-    ### 1. Current Daily Meal Plan (For reference, do not replicate these meals):
-    *Breakfast:*
-    - *Option:* ${currentMealPlan.breakfast[0].option}
-    - *Portion:* ${currentMealPlan.breakfast[0].portion}
-    - *Nutrition:* ${currentMealPlan.breakfast[0].nutrition}
-    - *How to Prepare:* ${currentMealPlan.breakfast[0].preparation}
-  
-    *Lunch:*
-    - *Option:* ${currentMealPlan.lunch[0].option}
-    - *Portion:* ${currentMealPlan.lunch[0].portion}
-    - *Nutrition:* ${currentMealPlan.lunch[0].nutrition}
-    - *How to Prepare:* ${currentMealPlan.lunch[0].preparation}
-  
-    *Dinner:*
-    - *Option:* ${currentMealPlan.dinner[0].option}
-    - *Portion:* ${currentMealPlan.dinner[0].portion}
-    - *Nutrition:* ${currentMealPlan.dinner[0].nutrition}
-    - *How to Prepare:* ${currentMealPlan.dinner[0].preparation}
-  
-    ### 2. New Daily Meal Plan (Generate a new, different meal plan):
-  
-    *Breakfast:*
-    - *Option:* ...
-      - *Portion:* ...
-      - *Nutrition:* ...
-      - *How to Prepare:* ...
-  
-    *Lunch:*
-    - *Option:* ...
-      - *Portion:* ...
-      - *Nutrition:* ...
-      - *How to Prepare:* ...
-  
-    *Dinner:*
-    - *Option:* ...
-      - *Portion:* ...
-      - *Nutrition:* ...
-      - *How to Prepare:* ...
-  
-    Stick exactly to this formatting, keep the structure clean and easy to read, and avoid adding any extra headings or explanations outside this format. In the nutrition part, give exact numbers, without approximations or "~". 
-    Separate the portion by "," and dont add parentheses.
-  
-    Protocol:
-    ${Object.entries(patientData.protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
-    
-    Special Patient Request
-    If the following request is reasonable and relevant to nutrition or preferences, take it into account. If it's unrelated or doesn't make sense (e.g., asking to include a house), ignore it completely.
+Based on the following protocol and the current meal plan, generate a new personalized daily plan.
 
-    Patient says:
-    "${specialRequest || "No special request provided."}"
-    
-    `;
+The response must strictly follow this structure:
+${dailyMealPlanPromptJSON}
+
+### 1. Current Daily Meal Plan (For reference, do not replicate these meals):
+${JSON.stringify(currentMealPlan)}
+  
+Protocol:
+${Object.entries(patientData.protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
+
+Special Patient Request
+If the following request is reasonable and relevant to nutrition or preferences, take it into account. If it's unrelated or doesn't make sense (e.g., asking to include a house), ignore it completely.
+
+Patient says:
+"${specialRequest || "No special request provided."}"
+
+Return only valid JSON ready to be parsed by code.
+
+In the nutrition part, give exact numbers, without approximations or "~".
+Make sure the nutritional values ​​match those described in the protocol.
+Separate the portion by "," and dont add parentheses.`;
 
     try {
       const response = await fetch("/api/openai", {
@@ -157,17 +123,15 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
       });
 
       const data = await response.json();
-      const markdownContent = data.response;
+      const newMealPlan = JSON.parse(data.response);
 
-      const newMealPlan = parseAIResponse(markdownContent);
-
-      setCurrentMealPlan(newMealPlan.dailyMealPlan);
+      setCurrentMealPlan(newMealPlan);
 
       const updatedPatientData = {
         ...patientData,
         treatment: {
           ...patientData.treatment,
-          dailyMealPlan: newMealPlan.dailyMealPlan,
+          dailyMealPlan: newMealPlan,
         }
       };
       
@@ -175,7 +139,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
 
       const updatedTreatment = {
         ...patientData.treatment,
-        dailyMealPlan: newMealPlan.dailyMealPlan,
+        dailyMealPlan: newMealPlan,
       };
 
       const updateResponse = await fetch("/api/update-treatment", {
@@ -303,21 +267,19 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
               <h3 className="text-base sm:text-lg font-bold text-gray-900">Breakfast</h3>
             </div>
 
-            {currentMealPlan.breakfast.map((item, index) => (
-              <div key={index} className="flex flex-col space-y-4">
-                <div className="text-gray-800 font-bold text-base sm:text-lg tracking-tight">{item.option}</div>
-                <ul className="list-disc pl-5 space-y-2">
-                  {item.portion?.split(',').map((ingredient, i) => renderPortionItem(ingredient))}
-                </ul>
-                {item.preparation && (
-                  <div className="text-gray-800 font-semibold text-sm sm:text-base">How to Prepare:</div>
-                )}
-                {item.preparation && (
-                  <div className="text-gray-600 text-xs sm:text-sm leading-relaxed">{item.preparation}</div>
-                )}
-                <div className="flex flex-wrap gap-1 sm:gap-2">{renderNutrition(parseNutrition(item.nutrition))}</div>
-              </div>
-            ))}
+            <div className="flex flex-col space-y-4">
+              <div className="text-gray-800 font-bold text-base sm:text-lg tracking-tight">{currentMealPlan.breakfast.option}</div>
+              <ul className="list-disc pl-5 space-y-2">
+                {currentMealPlan.breakfast.portion?.split(',').map((ingredient, i) => renderPortionItem(ingredient))}
+              </ul>
+              {currentMealPlan.breakfast.preparation && (
+                <div className="text-gray-800 font-semibold text-sm sm:text-base">How to Prepare:</div>
+              )}
+              {currentMealPlan.breakfast.preparation && (
+                <div className="text-gray-600 text-xs sm:text-sm leading-relaxed">{currentMealPlan.breakfast.preparation}</div>
+              )}
+              <div className="flex flex-wrap gap-1 sm:gap-2">{renderNutrition(parseNutrition(currentMealPlan.breakfast.nutrition))}</div>
+            </div>
           </div>
 
           {/* Meal Section - Lunch */}
@@ -331,21 +293,19 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
               <h3 className="text-base sm:text-lg font-bold text-gray-900">Lunch</h3>
             </div>
 
-            {currentMealPlan.lunch.map((item, index) => (
-              <div key={index} className="flex flex-col space-y-4">
-                <div className="text-gray-800 font-bold text-base sm:text-lg tracking-tight">{item.option}</div>
-                <ul className="list-disc pl-5 space-y-2">
-                  {item.portion?.split(',').map((ingredient, i) => renderPortionItem(ingredient))}
-                </ul>
-                {item.preparation && (
-                  <div className="text-gray-800 font-semibold text-sm sm:text-base">How to Prepare:</div>
-                )}
-                {item.preparation && (
-                  <div className="text-gray-600 text-xs sm:text-sm leading-relaxed">{item.preparation}</div>
-                )}
-                <div className="flex flex-wrap gap-1 sm:gap-2">{renderNutrition(parseNutrition(item.nutrition))}</div>
-              </div>
-            ))}
+            <div className="flex flex-col space-y-4">
+              <div className="text-gray-800 font-bold text-base sm:text-lg tracking-tight">{currentMealPlan.lunch.option}</div>
+              <ul className="list-disc pl-5 space-y-2">
+                {currentMealPlan.lunch.portion?.split(',').map((ingredient, i) => renderPortionItem(ingredient))}
+              </ul>
+              {currentMealPlan.lunch.preparation && (
+                <div className="text-gray-800 font-semibold text-sm sm:text-base">How to Prepare:</div>
+              )}
+              {currentMealPlan.lunch.preparation && (
+                <div className="text-gray-600 text-xs sm:text-sm leading-relaxed">{currentMealPlan.lunch.preparation}</div>
+              )}
+              <div className="flex flex-wrap gap-1 sm:gap-2">{renderNutrition(parseNutrition(currentMealPlan.lunch.nutrition))}</div>
+            </div>
           </div>
 
           {/* Meal Section - Dinner */}
@@ -359,21 +319,19 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
               <h3 className="text-base sm:text-lg font-bold text-gray-900">Dinner</h3>
             </div>
 
-            {currentMealPlan.dinner.map((item, index) => (
-              <div key={index} className="flex flex-col space-y-4">
-                <div className="text-gray-800 font-bold text-base sm:text-lg tracking-tight">{item.option}</div>
-                <ul className="list-disc pl-5 space-y-2">
-                  {item.portion?.split(',').map((ingredient, i) => renderPortionItem(ingredient))}
-                </ul>
-                {item.preparation && (
-                  <div className="text-gray-800 font-semibold text-sm sm:text-base">How to Prepare:</div>
-                )}
-                {item.preparation && (
-                  <div className="text-gray-600 text-xs sm:text-sm leading-relaxed">{item.preparation}</div>
-                )}
-                <div className="flex flex-wrap gap-1 sm:gap-2">{renderNutrition(parseNutrition(item.nutrition))}</div>
-              </div>
-            ))}
+            <div className="flex flex-col space-y-4">
+              <div className="text-gray-800 font-bold text-base sm:text-lg tracking-tight">{currentMealPlan.dinner.option}</div>
+              <ul className="list-disc pl-5 space-y-2">
+                {currentMealPlan.dinner.portion?.split(',').map((ingredient, i) => renderPortionItem(ingredient))}
+              </ul>
+              {currentMealPlan.dinner.preparation && (
+                <div className="text-gray-800 font-semibold text-sm sm:text-base">How to Prepare:</div>
+              )}
+              {currentMealPlan.dinner.preparation && (
+                <div className="text-gray-600 text-xs sm:text-sm leading-relaxed">{currentMealPlan.dinner.preparation}</div>
+              )}
+              <div className="flex flex-wrap gap-1 sm:gap-2">{renderNutrition(parseNutrition(currentMealPlan.dinner.nutrition))}</div>
+            </div>
           </div>
         </div>
       )}

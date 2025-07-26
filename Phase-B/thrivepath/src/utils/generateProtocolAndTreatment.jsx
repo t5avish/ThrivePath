@@ -1,75 +1,75 @@
 import ProtocolGenerator from "./ProtocolGenerator";
-import ResponseParser from "./ResponseParser";
+import { calculateAge } from ".";
 
-export function calculateAge(birthdate) {
-  const today = new Date();
-  const birthDate = new Date(birthdate);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
+export const dailyMealPlanPromptJSON = `{
+  "breakfast": {
+    "option": "",
+    "portion": "",
+    "nutrition": "",
+    "preparation": ""
+  },
+  "lunch": {
+    "option": "",
+    "portion": "",
+    "nutrition": "",
+    "preparation": ""
+  },
+  "dinner": {
+    "option": "",
+    "portion": "",
+    "nutrition": "",
+    "preparation": ""
   }
-  return age;
-}
+}`
 
 export async function generateProtocolAndTreatment({ birthdate, gender, weight }) {
   const age = calculateAge(birthdate);
   const protocol = ProtocolGenerator({ age, gender, weight });
 
+  const hydrationPromptJSON = `"hydration": {
+    "totalWater": "",
+    "tips": [
+      "", "", ""
+    ]
+  }`
+
+  const physicalActivityPromptJSON = `{
+    "type": "",
+    "duration": "",
+    "timingSuggestions": {
+      "morning": "",
+      "alternative": ""
+    },
+    "muscleStrengtheningActivities": ""
+  }`
+
+  const sleepSchedulePromptJSON = `{
+    "bedtime": "",
+    "wakeTime": "",
+    "routineTips": [
+      "", "", ""
+    ]
+  }`
+
   const prompt = `
-Based on the following protocol, generate a personalized daily plan divided into 4 sections,
-using **Markdown formatting** and the same style and structure shown below:
+Based on the following protocol, generate a personalized daily plan.
+The response must strictly follow this structure:
 
-### 1. Daily Meal Plan
-*Breakfast:*
-- *Option:* ...
-  - *Portion:* ...
-  - *Nutrition:* ...
-  - *How to Prepare:* ...
-
-*Lunch:*
-- *Option:* ...
-  - *Portion:* ...
-  - *Nutrition:* ...
-  - *How to Prepare:* ...
-
-*Dinner:*
-- *Option:* ...
-  - *Portion:* ...
-  - *Nutrition:* ...
-  - *How to Prepare:* ...
-
-
-### 2. Daily Hydration Recommendation
-- *Total Water:* ... cups of water daily.
-- *Tips to Stay Hydrated:*
-  - ...
-  - ...
-  - ...
-
-### 3. Physical Activity Plan
-- *Type:* ...
-- *Duration:* **Maximum 30 minutes daily**.
-- *Timing Suggestions:*
-  - *Morning:* ...
-  - *Alternative:* ...
-- *Muscle-strengthening Activities:* ...
-
-### 4. Sleep Schedule
-- *Bedtime:* ...
-- *Wake Time:* ...
-- *Bedtime Routine Tips:*
-  - ...
-  - ...
-  - ...
-
-Stick exactly to this formatting, keep the structure clean and easy to read, and avoid adding any extra headings or explanations outside this format.
-In the nutrition part, give exact numbers, without approximations or "~".
-Seperate the portion by "," and dont add parentheses.
-Make sure the nutritional values ​​match those described in the protocol.
+{
+  "dailyMealPlan": ${dailyMealPlanPromptJSON},
+  "hydration": ${hydrationPromptJSON},
+  "physicalActivity": ${physicalActivityPromptJSON},
+  "sleepSchedule": ${sleepSchedulePromptJSON}
+}
 
 Protocol:
 ${Object.entries(protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
+
+Return only valid JSON ready to be parsed by code.
+
+In the nutrition part, give exact numbers, without approximations or "~".
+Make sure the nutritional values ​​match those described in the protocol.
+Separate the portion by "," and dont add parentheses.
 `;
 
   const token = localStorage.getItem("token");
@@ -90,6 +90,6 @@ ${Object.entries(protocol).map(([key, value]) => `${key}: ${value}`).join('\n')}
     throw new Error(data.message || "Failed to get treatment plan");
   }
 
-  const treatment = ResponseParser(data.response);
+  const treatment = JSON.parse(data.response);
   return { protocol, treatment };
 }
