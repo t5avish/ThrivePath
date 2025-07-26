@@ -45,7 +45,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
   };
 
   const renderPortionItem = (ingredient) => {
-    const match = ingredient.trim().match(/^(\d+\s*[a-zA-Z]*)\s+(of)\s+(.+)$/i);
+    const match = ingredient.trim().match(/^([\d/]+\s*[a-zA-Z]*)\s+(of)\s+(.+)$/i);
     if (match) {
       const [_, quantity, connecting, item] = match;
       return (
@@ -57,7 +57,7 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
       );
     }
 
-    const simpleMatch = ingredient.trim().match(/^(\d+\s*[a-zA-Z]*)\s+(.+)$/i);
+    const simpleMatch = ingredient.trim().match(/^([\d/]+\s*[a-zA-Z]*)\s+(.+)$/i);
     if (simpleMatch) {
       const [_, quantity, item] = simpleMatch;
       return (
