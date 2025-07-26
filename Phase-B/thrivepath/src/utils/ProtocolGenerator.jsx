@@ -8,7 +8,7 @@ const getMedianWeight = (gender, age) => {
 
 const calculateDailyCalories = (currentWeight, medianWeight) => {
     if (!medianWeight) return null;
-    return 120 * (currentWeight / medianWeight) * currentWeight;
+    return (120 * (medianWeight / currentWeight)) * currentWeight;
 };
 
 const calculateDailyCarbohydrates = (DCV) => {
@@ -154,7 +154,7 @@ const ProtocolGenerator = ({ gender, age, weight }) => {
         age: `${age} years old`,
         gender: gender,
         weight: `${weight} kg`,
-        DCV: DCV ? `${DCV.toFixed(2)} kcal` : null,
+        dailyCalories: DCV ? `${DCV.toFixed(2)} kcal` : null,
         dailyCarbohydrates: dailyCarbohydrates ? `${dailyCarbohydrates.toFixed(2)} grams` : null,
         dailyProteins: dailyProteins ? `${dailyProteins.toFixed(2)} grams` : null,
         dailyFats: dailyFats ? `${dailyFats.toFixed(2)} grams` : null,
