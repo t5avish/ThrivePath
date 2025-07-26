@@ -110,9 +110,6 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
     - *Nutrition:* ${currentMealPlan.dinner[0].nutrition}
     - *How to Prepare:* ${currentMealPlan.dinner[0].preparation}
   
-    *Snacks:*
-    - *Option:* ${currentMealPlan.snacks[0].option}
-  
     ### 2. New Daily Meal Plan (Generate a new, different meal plan):
   
     *Breakfast:*
@@ -132,10 +129,6 @@ const MealPlan = ({ dailyMealPlan, patient }) => {
       - *Portion:* ...
       - *Nutrition:* ...
       - *How to Prepare:* ...
-  
-    *Snacks:*
-    - *Option:* ...
-    - *Option:* ...
   
     Stick exactly to this formatting, keep the structure clean and easy to read, and avoid adding any extra headings or explanations outside this format. In the nutrition part, give exact numbers, without approximations or "~". 
     Separate the portion by "," and dont add parentheses.

@@ -4,7 +4,6 @@ function parseAIResponse(markdownString) {
       breakfast: [],
       lunch: [],
       dinner: [],
-      snacks: []
     },
     hydration: {
       totalWater: "",
@@ -80,10 +79,9 @@ function parseMealPlan(section, result) {
     return mealItems;
   }
 
-  const breakfastSection = section.match(/\*Breakfast:\*([\s\S]*?)(?=\*Lunch:\*|\*Dinner:\*|\*Snacks:\*|$)/);
-  const lunchSection = section.match(/\*Lunch:\*([\s\S]*?)(?=\*Dinner:\*|\*Snacks:\*|$)/);
-  const dinnerSection = section.match(/\*Dinner:\*([\s\S]*?)(?=\*Snacks:\*|$)/);
-  const snacksSection = section.match(/\*Snacks:\*([\s\S]*?)(?=$|###)/);
+  const breakfastSection = section.match(/\*Breakfast:\*([\s\S]*?)(?=\*Lunch:\*|\*Dinner:\*|$)/);
+  const lunchSection = section.match(/\*Lunch:\*([\s\S]*?)(?=\*Dinner:\*|$)/);
+  const dinnerSection = section.match(/\*Dinner:\*([\s\S]*?)(?=$)/);
 
   if (breakfastSection) {
     result.dailyMealPlan.breakfast = parseMeal(breakfastSection[1]);
@@ -95,15 +93,6 @@ function parseMealPlan(section, result) {
 
   if (dinnerSection) {
     result.dailyMealPlan.dinner = parseMeal(dinnerSection[1]);
-  }
-
-  if (snacksSection) {
-    const snackItems = snacksSection[1].match(/-\s+\*Option:\*\s+(.*?)(?=\n|$)/g);
-    if (snackItems) {
-      result.dailyMealPlan.snacks = snackItems.map(snack => {
-        return snack.replace(/-\s+\*Option:\*\s+/, "").trim();
-      });
-    }
   }
 }
 
