@@ -1,3 +1,12 @@
+/*
+  SignUpPage.jsx
+
+  Handles user registration by collecting name, email, and password information.
+  Validates that both password fields match before submitting.
+  Sends the data to the backend for account creation.
+  Displays success or error messages based on the response.
+*/
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -12,13 +21,16 @@ const SignUpPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState(false);
 
+  // Update form field values on user input
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission and validation
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Password confirmation check
     if (formData.password !== formData.confirm_password) {
       setErrorMessage("Passwords do not match.");
       setSuccessMessage(false);
@@ -34,20 +46,23 @@ const SignUpPage = () => {
         body: JSON.stringify(formData),
       });
 
+      // Handle JSON and non-JSON responses
       const contentType = response.headers.get("content-type");
       const isJson = contentType && contentType.includes("application/json");
-
       const result = isJson ? await response.json() : await response.text();
 
       if (response.ok) {
+        // Show success message and reset form
         setSuccessMessage("Signup successful! You can now log in.");
         setErrorMessage("");
         setFormData({ name: "", email: "", password: "", confirm_password: "" });
       } else {
+        // Show server error
         setErrorMessage(result?.message || result || "An error occurred.");
         setSuccessMessage(false);
       }
     } catch (error) {
+      // Show fallback error on request failure
       console.error("Error:", error);
       setErrorMessage("An error occurred. Please try again later.");
       setSuccessMessage(false);

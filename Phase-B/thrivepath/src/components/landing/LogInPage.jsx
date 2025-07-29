@@ -1,8 +1,18 @@
+/*
+  LogInPage.jsx
+
+  This page handles user authentication by collecting login credentials
+  and sending them to the backend. If the login is successful, the user
+  is redirected to the patient selection screen. The authentication token
+  is stored in localStorage for session management.
+*/
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const SignInPage = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -10,10 +20,12 @@ const SignInPage = () => {
 
   const [error, setError] = useState("");
 
+  // Update form data state when user types
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission and authentication
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
@@ -26,13 +38,17 @@ const SignInPage = () => {
       });
 
       const data = await response.json();
+
       if (response.ok) {
+        // Store token and redirect user
         localStorage.setItem("token", data.token);
         navigate("/select-patient");
       } else {
+        // Show backend error message if login fails
         setError(data.message || "Login failed");
       }
     } catch (error) {
+      // Show fallback error message
       setError("Something went wrong");
     }
   };
