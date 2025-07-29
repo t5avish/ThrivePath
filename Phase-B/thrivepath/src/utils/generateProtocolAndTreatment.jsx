@@ -1,3 +1,14 @@
+/*
+ generateProtocolAndTreatment.js
+
+ Utility function that generates personalized medical protocols and treatment
+ plans for patients. Uses patient data to create structured
+ protocols via ProtocolGenerator, then sends formatted prompts to OpenAI API
+ to generate detailed daily meal plans, hydration schedules, physical activities,
+ and sleep routines based on the medical protocol requirements.
+
+*/
+
 import ProtocolGenerator from "./ProtocolGenerator";
 import { calculateAge } from ".";
 

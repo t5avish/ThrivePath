@@ -1,3 +1,14 @@
+/*
+ ProtocolGenerator.js
+
+ Utility function that generates personalized medical and nutritional protocols
+ for pediatric patients based on their data. Calculates daily
+ requirements for calories, macronutrients (carbs, proteins, fats), vitamins,
+ minerals, sleep hours, hydration, and physical activity using evidence-based
+ formulas and age-appropriate guidelines for children aged 1-12 years.
+
+*/
+
 const getMedianWeight = (gender, age) => {
     const medianWeights = {
         male: { 1: 10.2, 2: 12.3, 3: 14.6, 4: 16.7, 5: 18.7, 6: 20.6, 7: 22.9, 8: 25.6, 9: 28.7, 10: 32.1, 11: 36.4, 12: 40.8 },
