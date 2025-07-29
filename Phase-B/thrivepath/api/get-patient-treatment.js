@@ -1,3 +1,13 @@
+/*
+ get-patient-treatment.js
+
+ API route for retrieving a specific patient's treatment information and
+ growth history data. Validates JWT authentication and patient ownership,
+ then returns the patient's basic info, treatment details, protocol,
+ and complete measurement history for dashboard display and chart rendering.
+ 
+*/
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';

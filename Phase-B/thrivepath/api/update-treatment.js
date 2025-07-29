@@ -1,3 +1,12 @@
+/*
+ update-treatment.js
+
+ API route for updating a patient's treatment information. Validates JWT
+ authentication and patient ownership, then updates the treatment details
+ in the patient's record.
+ 
+*/
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';

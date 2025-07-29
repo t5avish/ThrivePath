@@ -1,3 +1,12 @@
+/*
+ openai.js
+
+ API route for integrating OpenAI's GPT model into the application. Validates
+ JWT authentication, processes chat messages from the frontend, and forwards
+ them to OpenAI's API. Returns the AI-generated response.
+
+ */
+
 import OpenAI from "openai";
 import jwt from "jsonwebtoken";
 import cors from "../lib/cors";

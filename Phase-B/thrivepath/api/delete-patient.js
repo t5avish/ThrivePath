@@ -1,3 +1,13 @@
+/*
+ delete-patient.js
+
+ API route for permanently deleting a patient and all their associated data
+ from the system. Validates JWT authentication and ensures only the patient's
+ owner can perform the deletion. Validates patient ID format and confirms
+ successful deletion before responding to the client.
+
+*/
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';

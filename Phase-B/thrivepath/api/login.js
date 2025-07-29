@@ -1,3 +1,13 @@
+/*
+ login.js
+
+ API route for user authentication. Validates user credentials against the
+ database, performs email and password verification, and generates a JWT
+ token for session management. Returns the authentication token on successful
+ login for use in subsequent API requests.
+ 
+*/
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';

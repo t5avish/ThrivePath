@@ -1,3 +1,13 @@
+/*
+ update-patient-history.js
+
+ API route for adding new growth measurement entries to a patient's history.
+ Validates JWT authentication and patient ownership, then appends new weight
+ and height measurements to the patient's record while also updating their
+ current treatment protocol.
+
+ */
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';

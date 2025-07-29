@@ -1,3 +1,13 @@
+/*
+  delete-patient-history.js
+
+  API route for deleting specific growth measurement entries from a patient's
+  history. Validates JWT authentication and patient ownership, then removes
+  the history entry matching the provided date from the patient's record.
+  Includes detailed error handling for missing entries and date format mismatches.
+
+*/
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';

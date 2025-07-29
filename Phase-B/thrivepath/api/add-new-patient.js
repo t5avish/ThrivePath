@@ -1,3 +1,13 @@
+/*
+  add-new-patient.js
+
+  API route for adding new patients to the system. Validates JWT authentication,
+  ensures required patient information (name, gender, birthdate) is provided,
+  and stores the patient record in MongoDB with the authenticated user's ID.
+  Returns the created patient ID on successful creation.
+  
+*/
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';

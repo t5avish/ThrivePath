@@ -1,3 +1,13 @@
+/*
+ get-user-patients.js
+
+ API route for retrieving all patients associated with the authenticated user.
+ Validates JWT authentication and returns a complete list of the user's patients
+ along with the total count, used for populating the patient selection screen
+ and dashboard overview.
+ 
+*/
+
 import { connectToDatabase } from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import cors from '../lib/cors';
