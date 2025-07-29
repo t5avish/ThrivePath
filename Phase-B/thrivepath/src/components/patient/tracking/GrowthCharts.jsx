@@ -1,3 +1,14 @@
+/*
+  GrowthCharts.jsx
+
+  This component renders interactive growth charts (weight and height) that display
+  patient measurements against standard pediatric percentile curves. It supports
+  zoom controls, custom age ranges, and allows users to delete measurement points
+  by double-clicking. The charts use Recharts library with custom tooltips that
+  show percentile ranges and measurement dates.
+  
+*/
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -51,6 +62,7 @@ const CustomAxisTick = ({ x, y, payload, isXAxis = true }) => {
   );
 };
 
+// Calculate which percentile range a measurement falls into
 const getPercentileRange = (value, age, percentileData, type) => {
   if (!value || !percentileData) return "Not available";
   
@@ -75,6 +87,7 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
     
     if (!actualDataPoint) return null;
     
+    // Calculate percentile range for the measurement
     const percentileRange = getPercentileRange(
       actualDataPoint.value,
       label,
@@ -84,6 +97,7 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
     
     const dataPoint = actualDataPoint.payload;
     
+    // Handle various date formats and display measurement date
     let showDateDisplay = false;
     let dateDisplay = '';
     
@@ -158,6 +172,7 @@ const CustomTooltip = ({ active, payload, label, unit, percentileData, type }) =
   return null;
 };
 
+// Transform percentile data from JSON format to chart-ready format  
 const getPercentileLinesData = (gender, type) => {
   const data = percentiles[gender][type];
   const formatted = [];
@@ -186,6 +201,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
 
+  // Detect mobile screen size for responsive chart rendering
   React.useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -197,6 +213,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Process history data and fix date formatting issues
   const processedHistoryData = React.useMemo(() => {
     
     if (!historyData || !historyData.length) return [];
@@ -214,6 +231,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     
   }, [historyData, birthDate]);
 
+  // Handle double-click on chart points to trigger delete modal
   const handleDoubleClick = (data) => {
     if (!data || !data.payload) return;
     
@@ -225,6 +243,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     });
   };
 
+  // Confirm deletion and send delete request to backend
   const handleConfirmDelete = async () => {
     if (!deleteModal.dataPoint) return;
     
@@ -259,6 +278,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
         throw new Error(result.message || 'Failed to delete checkpoint');
       }
       
+      // Update parent component to remove deleted checkpoint
       if (onDeleteCheckpoint) {
         onDeleteCheckpoint(dateForDeletion);
       }
@@ -285,6 +305,7 @@ const GrowthCharts = ({ historyData, activeTab, birthDate, onDeleteCheckpoint, p
     });
   };
 
+  // Apply custom age range with validation
   const applyCustomRange = () => {
     const min = parseFloat(customRange.min);
     const max = parseFloat(customRange.max);
@@ -384,6 +405,7 @@ const ChartBlock = ({
     .map(item => item.ageYears)
     .filter(age => !isNaN(age));
   
+  // Calculate chart age range based on zoom level and data
   let minAge, maxAge;
   
   if (zoomLevel === "full") {
@@ -400,10 +422,12 @@ const ChartBlock = ({
     maxAge = Math.min(12, Math.ceil(Math.max(...actualAges)) + 1);
   }
   
+  // Filter data to show only points within the age range
   const filteredHistoryData = historyData.filter(item => {
     return item.ageYears >= minAge && item.ageYears <= maxAge;
   });
   
+  // Calculate Y-axis range based on all visible data points
   const allValues = [
     ...filteredHistoryData.map(item => item[dataKeyActual]),
     ...percentileData
@@ -418,6 +442,7 @@ const ChartBlock = ({
   const minValue = Math.floor(dataMin - (valueRange * 0.1));
   const maxValue = Math.ceil(dataMax + (valueRange * 0.1));
   
+  // Responsive chart dimensions
   const chartHeight = isMobile ? 350 : 500;
   const chartMargin = isMobile 
     ? { top: 20, right: 15, left: 5, bottom: 40 }
@@ -512,6 +537,7 @@ const ChartBlock = ({
               />
             )}
 
+            {/* Render smooth percentile curves with interpolation */}
             {percentiles.map((p) => {
               const allPercentileData = [...percentileData];
               
@@ -534,6 +560,7 @@ const ChartBlock = ({
                       [p]: lowerPoint[p]
                     });
                   } 
+                  // Interpolate between data points for smoother curves
                   else {
                     const ageRange = upperPoint.ageYears - lowerPoint.ageYears;
                     if (ageRange > 0) {
@@ -581,6 +608,7 @@ const ChartBlock = ({
               );
             })}
 
+            {/* Patient data line with clickable dots */}
             <Line
               type="monotone"
               data={filteredHistoryData}

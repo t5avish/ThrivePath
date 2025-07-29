@@ -1,3 +1,14 @@
+/*
+  TrackingPage.jsx
+
+  This is the main patient tracking page that displays growth charts and measurement
+  statistics. It handles the patient's measurement history, allows adding new measurements
+  through a modal form, and manages chart data visualization. The page calculates patient
+  age in years, processes measurement data for chart display, and handles CRUD operations
+  for patient history records including deletion of measurement checkpoints.
+  
+*/
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { DateTime } from "luxon";
@@ -21,6 +32,7 @@ const TrackingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
 
+  // Standard median values for comparison - used as target values in charts
   const medianWeights = {
     male: { 1: 10.2, 2: 12.3, 3: 14.6, 4: 16.7, 5: 18.7, 6: 20.6, 7: 22.9, 8: 25.6, 9: 28.7, 10: 32.1, 11: 36.4, 12: 40.8 },
     female: { 1: 9.6, 2: 11.8, 3: 14.1, 4: 16.3, 5: 18.4, 6: 20.6, 7: 23.2, 8: 26.3, 9: 29.9, 10: 33.8, 11: 38.4, 12: 42.9 }
@@ -31,6 +43,7 @@ const TrackingPage = () => {
   };
   const gender = patient?.protocol?.gender?.toLowerCase() || "male";
 
+  // Process patient history data and calculate ages for chart display
   useEffect(() => {
     if (!patient) navigate(`/treatment/${patientId}`);
     if (patient?.history) {
@@ -52,15 +65,19 @@ const TrackingPage = () => {
         };
       });
       
+      // Sort by age for proper chart rendering
       formattedData.sort((a, b) => a.ageYears - b.ageYears);
       
       setHistoryData(formattedData);
     }
   }, [patient, patientId, navigate]);
+  
+  // Remove deleted checkpoint from local state
   const handleDeleteCheckpoint = (dateToDelete) => {
     setHistoryData(prev => prev.filter(entry => entry.date !== dateToDelete));
   };
 
+  // Submit new measurement data and update patient protocol
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -73,6 +90,7 @@ const TrackingPage = () => {
     }
     const token = localStorage.getItem("token");
     try {
+      // Generate new protocol based on updated measurements
       const { protocol, treatment } = await generateProtocolAndTreatment({
         birthdate: patient.birthdate,
         gender: patient.protocol.gender,
@@ -89,6 +107,7 @@ const TrackingPage = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Update failed.");
       
+      // Create new entry for local state update
       const newDate = DateTime.now().toUTC().toISO();
       const dateObj = DateTime.fromISO(newDate).setZone("Asia/Jerusalem");
       const birthDate = DateTime.fromISO(patient.birthdate);
@@ -106,6 +125,7 @@ const TrackingPage = () => {
         targetHeight: medianHeights[gender]?.[roundedAgeYear] || null,
       };
       
+      // Add new entry and maintain chronological order
       setHistoryData(prev => {
         const newData = [...prev, newEntry];
         return newData.sort((a, b) => a.ageYears - b.ageYears);
@@ -158,6 +178,7 @@ const TrackingPage = () => {
         </div>
       </footer>
 
+      {/* Modal for adding new measurements */}
       {showForm && (
         <UpdateMeasurementModal
           onClose={() => !isLoading && setShowForm(false)}

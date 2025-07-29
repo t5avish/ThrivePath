@@ -1,13 +1,24 @@
+/*
+  StatsSummary.jsx
+
+  This component displays the patient growth tracking dashboard summary.
+  It shows current measurements in stat cards, provides an update button
+  to add new measurements, and includes tab navigation for filtering
+  different chart views (all, weight, height). Uses Luxon for date formatting.
+*/
+
 import React from "react";
 import { DateTime } from "luxon";
 
 const StatsSummary = ({ latestEntry, historyData, onUpdateClick, activeTab, setActiveTab }) => (
   <>
+    {/* Header section with title and update button */}
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Growth Tracking</h1>
         <p className="text-gray-600 text-sm">Monitor and update patient growth measurements</p>
       </div>
+      {/* Update measurements button */}
       <button
         onClick={onUpdateClick}
         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all hover:scale-105 shadow flex items-center gap-2 self-start"
@@ -19,18 +30,22 @@ const StatsSummary = ({ latestEntry, historyData, onUpdateClick, activeTab, setA
       </button>
     </div>
 
+    {/* Statistics cards displaying current measurements */}
     {latestEntry && (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Current weight card */}
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">
           <div className="text-sm text-gray-500 mb-1">Current Weight</div>
           <div className="text-2xl font-bold text-gray-800">{latestEntry.weight} kg</div>
         </div>
 
+        {/* Current height card */}
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">
           <div className="text-sm text-gray-500 mb-1">Current Height</div>
           <div className="text-2xl font-bold text-gray-800">{latestEntry.height} cm</div>
         </div>
 
+        {/* Last updated card with formatted date and time */}
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">
           <div className="text-sm text-gray-500 mb-1">Last Updated</div>
           <div className="text-lg font-bold text-gray-800">
@@ -45,6 +60,7 @@ const StatsSummary = ({ latestEntry, historyData, onUpdateClick, activeTab, setA
           </div>
         </div>
 
+        {/* Total records card with first record date */}
         <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition-shadow">
           <div className="text-sm text-gray-500 mb-1">Total Records</div>
           <div className="text-2xl font-bold text-gray-800">{historyData.length}</div>
@@ -57,6 +73,7 @@ const StatsSummary = ({ latestEntry, historyData, onUpdateClick, activeTab, setA
       </div>
     )}
 
+    {/* Tab navigation for chart filtering */}
     <div className="bg-white p-2 rounded-lg shadow-sm inline-flex mb-6">
       {['all', 'weight', 'height'].map((tab) => (
         <button

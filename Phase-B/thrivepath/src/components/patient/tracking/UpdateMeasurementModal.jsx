@@ -1,3 +1,13 @@
+/*
+  UpdateMeasurementModal.jsx
+
+  This modal component allows healthcare providers to input new patient
+  growth measurements (weight and height). It validates input fields,
+  handles form submission with loading states, and provides a clean
+  interface for updating patient records with new checkpoint data.
+  
+*/
+
 import React from "react";
 
 const UpdateMeasurementModal = ({
@@ -11,6 +21,7 @@ const UpdateMeasurementModal = ({
 }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
     <div className="bg-white p-6 rounded-xl shadow-xl max-w-md w-full relative animate-fadeIn">
+      {/* Close button with loading state handling */}
       <button
         onClick={onClose}
         disabled={isLoading}
@@ -21,12 +32,15 @@ const UpdateMeasurementModal = ({
         </svg>
       </button>
 
+      {/* Modal header */}
       <div className="mb-6 text-center">
         <h2 className="text-xl font-bold text-gray-800">Update Measurements</h2>
         <p className="text-gray-600 text-sm mt-1">Enter the latest growth measurements</p>
       </div>
 
+      {/* Measurement input form */}
       <form onSubmit={onSubmit} className="space-y-5">
+        {/* Weight input field */}
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-700">Weight (kg)</label>
           <input
@@ -40,6 +54,7 @@ const UpdateMeasurementModal = ({
             min="0"
           />
         </div>
+        {/* Height input field */}
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-700">Height (cm)</label>
           <input
@@ -53,6 +68,7 @@ const UpdateMeasurementModal = ({
             min="0"
           />
         </div>
+        {/* Submit button with loading state */}
         <div className="pt-2">
           <button
             type="submit"

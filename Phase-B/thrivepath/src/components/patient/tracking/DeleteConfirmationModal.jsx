@@ -1,6 +1,17 @@
+/*
+  DeleteConfirmationModal.jsx
+
+  This modal component provides a confirmation dialog for deleting patient
+  growth measurement checkpoints. It displays the checkpoint details (date,
+  weight, height) and handles the confirmation flow with loading states.
+  Prevents accidental deletions by requiring explicit user confirmation.
+  
+*/
+
 import React from "react";
 
 const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, dataPoint, isLoading }) => {
+  // Don't render modal if not open
   if (!isOpen) return null;
 
   return (
@@ -12,6 +23,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, dataPoint, isLoad
             <h3 className="text-lg font-semibold text-gray-900">
               Delete Checkpoint
             </h3>
+            {/* Close button with loading state handling */}
             <button
               onClick={onClose}
               disabled={isLoading}
@@ -29,6 +41,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, dataPoint, isLoad
               Are you sure you want to delete this checkpoint? This action cannot be undone.
             </p>
             
+            {/* Display checkpoint details if available */}
             {dataPoint && (
               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between">
@@ -51,6 +64,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, dataPoint, isLoad
 
           {/* Actions */}
           <div className="flex gap-3 justify-end">
+            {/* Cancel button */}
             <button
               onClick={onClose}
               disabled={isLoading}
@@ -58,6 +72,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, dataPoint, isLoad
             >
               Cancel
             </button>
+            {/* Delete confirmation button with loading state */}
             <button
               onClick={onConfirm}
               disabled={isLoading}

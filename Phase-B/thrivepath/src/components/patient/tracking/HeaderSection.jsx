@@ -1,11 +1,24 @@
+/*
+  HeaderSection.jsx
+
+  This component renders the main navigation header for the patient tracking
+  and treatment pages. It includes responsive navigation with mobile hamburger
+  menu, navigation links between Treatment and Tracking sections, and logout
+  functionality. The header handles token removal and navigation routing for
+  user authentication flow.
+  
+*/
+
 import React from "react";
 
 const HeaderSection = ({ menuOpen, setMenuOpen, navigate, patientId }) => {
+  // Clear authentication token and redirect to sign-in page
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/signin");
   };
 
+  // Navigate back to patient selection screen
   const handleGoBack = () => navigate("/select-patient");
 
   return (
@@ -15,6 +28,7 @@ const HeaderSection = ({ menuOpen, setMenuOpen, navigate, patientId }) => {
           <div className="text-blue-600 text-xl font-bold">ThrivePath</div>
         </div>
 
+        {/* Mobile hamburger menu toggle */}
         <button
           className="md:hidden p-2 rounded-md hover:bg-gray-100"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -24,6 +38,7 @@ const HeaderSection = ({ menuOpen, setMenuOpen, navigate, patientId }) => {
           </svg>
         </button>
 
+        {/* Desktop navigation menu */}
         <nav className="hidden md:flex items-center justify-end gap-4">
           <a
             onClick={() => navigate(`/treatment/${patientId}`)}
@@ -58,6 +73,7 @@ const HeaderSection = ({ menuOpen, setMenuOpen, navigate, patientId }) => {
         </nav>
       </div>
 
+      {/* Mobile menu dropdown */}
       {menuOpen && (
         <div className="md:hidden py-2 px-2 border-t border-gray-100 bg-white mt-2">
           <div className="space-y-1">
@@ -73,6 +89,7 @@ const HeaderSection = ({ menuOpen, setMenuOpen, navigate, patientId }) => {
             >
               Tracking
             </a>
+            {/* Close mobile menu after navigation */}
             <button
               onClick={() => { handleGoBack(); setMenuOpen(false); }}
               className="w-full text-left py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md flex items-center gap-1"
