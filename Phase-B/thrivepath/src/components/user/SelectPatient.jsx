@@ -1,3 +1,13 @@
+/*
+  SelectPatient.jsx
+
+  Displays a list of patients associated with the logged-in user.
+  Fetches patients from the backend using the stored auth token.
+  Allows the user to select a patient to view treatment details,
+  add a new patient, logout, and delete existing patients with confirmation.
+  Handles authentication redirects if no valid token is found.
+*/
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,10 +22,12 @@ const SelectPatient = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
+      // Redirect to signin if no token is found
       navigate("/signin");
       return;
     }
 
+    // Fetch patients belonging to the current user
     const fetchPatients = async () => {
       try {
         const response = await fetch("/api/get-user-patients", {
@@ -43,24 +55,29 @@ const SelectPatient = () => {
     fetchPatients();
   }, [navigate]);
 
+  // Navigate to treatment page for selected patient
   const handleSelect = (patientId) => {
     navigate(`/treatment/${patientId}`);
   };
 
+  // Navigate to form for adding a new patient
   const handleAddNewChild = () => {
     navigate("/add-patient-info");
   };
 
+  // Clear token and redirect to signin on logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/signin");
   };
   
+  // Show confirmation modal before deleting patient
   const handleDeleteClick = (patient) => {
     setPatientToDelete(patient);
     setShowDeleteConfirm(true);
   };
   
+  // Confirm deletion and call backend to delete patient
   const handleConfirmDelete = async () => {
     if (!patientToDelete) return;
     
@@ -79,6 +96,7 @@ const SelectPatient = () => {
         throw new Error("Failed to delete patient");
       }
       
+      // Remove deleted patient from local state
       setPatients(patients.filter(p => p._id !== patientToDelete._id));
       setShowDeleteConfirm(false);
       setPatientToDelete(null);
@@ -88,6 +106,7 @@ const SelectPatient = () => {
     }
   };
   
+  // Cancel the deletion process
   const handleCancelDelete = () => {
     setShowDeleteConfirm(false);
     setPatientToDelete(null);

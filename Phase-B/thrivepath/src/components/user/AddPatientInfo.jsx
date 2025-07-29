@@ -1,3 +1,18 @@
+/*
+  AddPatientInfo.jsx
+
+  Step 1 of adding a new patient: collects general information including
+  name, gender, birthdate, height, and weight.
+  
+  Performs validation on all inputs:
+    - Name must be 2-70 characters, letters/spaces/hyphens only.
+    - Gender selection required.
+    - Birthdate must be valid, not in the future, and child must be ≤ 12 years old.
+    - Height and weight must be within realistic ranges.
+  
+  On successful validation, navigates to the next step, passing collected data.
+*/
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -25,6 +40,7 @@ const AddPatient1 = () => {
   const [errors, setErrors] = useState({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
+  // Validate form fields with detailed rules
   const validate = () => {
     const errs = {};
 
@@ -71,6 +87,7 @@ const AddPatient1 = () => {
     return errs;
   };
 
+  // Re-validate whenever form data changes after first submission
   useEffect(() => {
     if (hasSubmitted) {
       const validationErrors = validate();
@@ -78,10 +95,12 @@ const AddPatient1 = () => {
     }
   }, [formData, hasSubmitted]);
 
+  // Update form data state on input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // On submit, validate and navigate if no errors
   const handleSubmit = (e) => {
     e.preventDefault();
     setHasSubmitted(true);

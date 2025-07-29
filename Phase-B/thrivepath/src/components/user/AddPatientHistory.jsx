@@ -1,3 +1,14 @@
+/*
+  AddPatientHistory.jsx (AddPatient2 Component)
+
+  This component is Step 2 in adding a new child patient.
+  It handles growth history input for a child, generating milestone dates 
+  from birthdate until today, allowing height and weight entry.
+
+  It validates inputs, submits the data along with generated protocol 
+  and treatment info, and handles loading and errors.
+*/
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { generateProtocolAndTreatment } from "../../utils/generateProtocolAndTreatment";
@@ -5,14 +16,24 @@ import { generateProtocolAndTreatment } from "../../utils/generateProtocolAndTre
 const AddPatient2 = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Error message for general form submission or fetch issues
   const [error, setError] = useState("");
+
+  // Loading state during async submission
   const [isLoading, setIsLoading] = useState(false);
+
+  // Growth history entries with date, age, height, and weight
   const [growthHistory, setGrowthHistory] = useState([]);
+
+  // Validation errors keyed by input fields
   const [errors, setErrors] = useState({});
-  
+
+  // On mount, check auth and generate growth entries if birthdate available
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
+      // No auth token - redirect to sign in
       navigate("/signin");
     }
     
@@ -20,15 +41,17 @@ const AddPatient2 = () => {
       generateGrowthEntries(location.state.birthdate);
     }
   }, [navigate, location.state]);
-  
+
+  // Generate milestone dates every 6 months from birth until today
   const generateGrowthEntries = (birthdate) => {
     const birthDate = new Date(birthdate);
     const today = new Date();
     const entries = [];
-    
+
     let currentDate = new Date(birthDate);
     let ageInYears = 0;
-    
+
+    // First entry at birth
     entries.push({
       date: currentDate.toISOString().split('T')[0],
       ageLabel: "Age 0",
@@ -36,14 +59,15 @@ const AddPatient2 = () => {
       height: "",
       weight: "",
     });
-    
+
+    // Add entries every 6 months until today
     while (true) {
       currentDate.setMonth(currentDate.getMonth() + 6);
       
       if (currentDate > today) break;
       
       ageInYears += 0.5;
-      
+
       entries.push({
         date: currentDate.toISOString().split('T')[0],
         ageLabel: `Age ${ageInYears % 1 === 0 ? ageInYears : ageInYears.toFixed(1)}`,
@@ -52,7 +76,8 @@ const AddPatient2 = () => {
         weight: "",
       });
     }
-    
+
+    // Add current date entry, with possible initial height/weight values
     const ageInYearsCurrent = calculateAgeInYears(birthDate, today);
     entries.push({
       date: today.toISOString().split('T')[0],
@@ -61,26 +86,29 @@ const AddPatient2 = () => {
       height: location.state?.height || "",
       weight: location.state?.weight || "",
     });
-    
+
     setGrowthHistory(entries);
   };
-  
+
+  // Calculate exact age in years as decimal
   const calculateAgeInYears = (birthDate, currentDate) => {
     const ageInMilliseconds = currentDate - birthDate;
     const millisecondsPerYear = 1000 * 60 * 60 * 24 * 365.25;
     return ageInMilliseconds / millisecondsPerYear;
   };
-  
+
+  // Update height or weight for a given entry index
   const handleGrowthChange = (index, field, value) => {
     const updatedHistory = [...growthHistory];
     updatedHistory[index][field] = value;
     setGrowthHistory(updatedHistory);
   };
-  
+
+  // Validate height and weight inputs with proper ranges
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
-    
+
     growthHistory.forEach((entry, index) => {
       if (entry.height || entry.weight) {
         if (entry.height) {
@@ -90,7 +118,7 @@ const AddPatient2 = () => {
             isValid = false;
           }
         }
-        
+
         if (entry.weight) {
           const weight = parseFloat(entry.weight);
           if (isNaN(weight) || weight < 2 || weight > 150) {
@@ -100,18 +128,19 @@ const AddPatient2 = () => {
         }
       }
     });
-    
+
     setErrors(newErrors);
     return isValid;
   };
 
+  // Handle form submission: validate, generate protocol/treatment, save patient
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
@@ -122,12 +151,14 @@ const AddPatient2 = () => {
     }
 
     try {
+      // Generate protocol and treatment using helper utility
       const { protocol, treatment } = await generateProtocolAndTreatment({
         birthdate: location.state.birthdate,
         gender: location.state.gender,
         weight: location.state.weight,
       });
 
+      // Filter and map growth history entries with numeric height/weight
       const historyEntries = growthHistory
         .filter(entry => entry.height || entry.weight)
         .map(entry => ({
@@ -137,6 +168,7 @@ const AddPatient2 = () => {
           ageInYears: entry.ageInYears
         }));
 
+      // Compose final patient data payload
       const patientData = {
         ...location.state,
         treatment,
@@ -144,6 +176,7 @@ const AddPatient2 = () => {
         history: historyEntries,
       };
 
+      // Save patient data to backend API
       const saveResponse = await fetch("/api/add-new-patient", {
         method: "POST",
         headers: {
@@ -158,10 +191,11 @@ const AddPatient2 = () => {
         throw new Error(errorData.message || "Failed to save patient");
       }
 
+      // On success, navigate to select patient screen
       navigate("/select-patient");
     } catch (error) {
       console.error("Error saving patient:", error);
-      setError(error.message);
+      setError("Please try again.");
     } finally {
       setIsLoading(false);
     }
